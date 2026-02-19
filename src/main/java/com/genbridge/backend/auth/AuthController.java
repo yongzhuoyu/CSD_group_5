@@ -1,5 +1,7 @@
 package com.genbridge.backend.auth;
 
+import com.genbridge.backend.auth.dto.LoginRequest;
+import com.genbridge.backend.auth.dto.LoginResponse;
 import com.genbridge.backend.auth.dto.RegistrationRequest;
 import com.genbridge.backend.user.UserService;
 import jakarta.validation.Valid;
@@ -10,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -23,19 +23,7 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @Operation(
-        summary = "Register a new user",
-        description = "Creates a new user account with email and password. Returns a success message or error."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Registration successful"),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Validation error or duplicate email",
-            content = @Content(schema = @Schema(implementation = com.genbridge.backend.auth.dto.ErrorResponse.class))
-        ),
-        @ApiResponse(responseCode = "500", description = "Server error")
-    })
+    @Operation(summary = "Register a new user")
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequest request) {
         try {
@@ -45,6 +33,24 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Registration failed.");
+        }
+    }
+
+    @Operation(summary = "Login with email and password", description = "Returns a JWT token on success.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Login successful, returns JWT token"),
+        @ApiResponse(responseCode = "401", description = "Invalid email or password")
+    })
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        try {
+            LoginResponse response = userService.loginUser(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            // Return 401 Unauthorized with the clear error message
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login failed.");
         }
     }
 }
