@@ -2,6 +2,7 @@ package com.genbridge.backend.controller;
 
 import com.genbridge.backend.dto.ContentRequest;
 import com.genbridge.backend.services.ContentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class ContentController {
     
     @PostMapping("/draft")
     public ResponseEntity<Map<String, String>> saveDraft(
-            @RequestBody ContentRequest request,
+            @Valid @RequestBody ContentRequest request,
             @RequestParam Long contributorId) {
         
         contentService.createContent(request, contributorId);
@@ -29,7 +30,7 @@ public class ContentController {
     
     @PostMapping("/publish")
     public ResponseEntity<Map<String, String>> publishContent(
-            @RequestBody ContentRequest request,
+            @Valid @RequestBody ContentRequest request,
             @RequestParam Long contributorId) {
         
         contentService.createContent(request, contributorId);
