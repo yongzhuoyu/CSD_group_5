@@ -1,5 +1,6 @@
 package com.genbridge.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.genbridge.backend.user.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -7,6 +8,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "content")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Content {
 
     @Id
@@ -24,6 +26,7 @@ public class Content {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contributor_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private User contributor;
 
     @Column(nullable = false)

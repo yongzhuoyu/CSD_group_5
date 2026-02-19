@@ -48,4 +48,29 @@ public class ContentService {
     public List<Content> getApprovedContent() {
         return contentRepository.findByStatus("APPROVED");
     }
+
+    // Admin methods
+    public Content approveContent(UUID contentId) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new RuntimeException("Content not found"));
+        content.setStatus("APPROVED");
+        return contentRepository.save(content);
+    }
+
+    public Content rejectContent(UUID contentId) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new RuntimeException("Content not found"));
+        content.setStatus("REJECTED");
+        return contentRepository.save(content);
+    }
+
+    public void deleteContent(UUID contentId) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new RuntimeException("Content not found"));
+        contentRepository.delete(content);
+    }
+
+    public List<Content> getPendingContent() {
+        return contentRepository.findByStatus("PENDING");
+    }
 }

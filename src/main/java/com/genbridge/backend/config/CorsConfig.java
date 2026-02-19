@@ -7,20 +7,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * CORS Configuration for GenBridge
  * Allows React frontend to communicate with Spring Boot backend
+ * Also allows Swagger UI to load OpenAPI documentation
  */
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOrigins(
-                    "http://localhost:3000",      // React dev server
-                    "http://localhost:5173",      // Vite dev server (alternative)
-                    "https://your-production-url.com"  // TODO: Add production URL
-                )
+        // Allow ALL origins for development (Swagger UI, Postman, etc.)
+        registry.addMapping("/**")
+                .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")
+                .exposedHeaders("Authorization")
                 .allowCredentials(true)
                 .maxAge(3600);
     }

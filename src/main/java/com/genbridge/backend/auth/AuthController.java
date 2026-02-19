@@ -4,17 +4,18 @@ import com.genbridge.backend.auth.dto.LoginRequest;
 import com.genbridge.backend.auth.dto.LoginResponse;
 import com.genbridge.backend.auth.dto.RegistrationRequest;
 import com.genbridge.backend.user.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Authentication", description = "User authentication endpoints for login and registration")
 public class AuthController {
 
     private final UserService userService;
@@ -23,7 +24,12 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @Operation(summary = "Register a new user")
+    @Operation(summary = "Register a new user", description = "Create a new user account with email and password. Default role is USER.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Registration successful"),
+        @ApiResponse(responseCode = "400", description = "Invalid input or email already exists"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequest request) {
         try {
@@ -36,10 +42,11 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "Login with email and password", description = "Returns a JWT token on success.")
+    @Operation(summary = "Login with email and password", description = "Authenticate user and receive JWT token. Token valid for 24 hours.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Login successful, returns JWT token"),
-        @ApiResponse(responseCode = "401", description = "Invalid email or password")
+        @ApiResponse(responseCode = "401", description = "Invalid email or password"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {

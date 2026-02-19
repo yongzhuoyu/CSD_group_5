@@ -13,11 +13,20 @@ public class RegistrationRequest {
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
+    private String role = "USER"; // Default role is USER
+
     public RegistrationRequest() {}
 
     public RegistrationRequest(String email, String password) {
         this.email = email;
         this.password = password;
+        this.role = "USER";
+    }
+
+    public RegistrationRequest(String email, String password, String role) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
     public String getEmail() {
@@ -34,5 +43,13 @@ public class RegistrationRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

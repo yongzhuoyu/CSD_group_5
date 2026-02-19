@@ -27,7 +27,12 @@ public class UserService {
             throw new IllegalArgumentException("Email is already registered.");
         }
         String hashedPassword = passwordEncoder.encode(request.getPassword());
-        User user = new User(request.getEmail(), hashedPassword, "LEARNER");
+        // Default to USER role, only ADMIN can be set if explicitly provided
+        String role = "USER";
+        if (request.getRole() != null && (request.getRole().equals("ADMIN") || request.getRole().equals("USER"))) {
+            role = request.getRole();
+        }
+        User user = new User(request.getEmail(), hashedPassword, role);
         userRepository.save(user);
     }
 
