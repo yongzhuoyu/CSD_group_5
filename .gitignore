@@ -54,3 +54,8 @@ coverage/
 *.bak
 *.swp
 *~.nib
+
+# Frontend workspace artifacts
+src/main/java/com/genbridge/user_interface/node_modules/
+src/main/java/com/genbridge/user_interface/dist/
+src/main/java/com/genbridge/user_interface/.vite/
