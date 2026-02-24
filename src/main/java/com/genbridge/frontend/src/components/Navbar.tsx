@@ -1,8 +1,22 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import { Sparkles, LogOut } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+  const isLoggedIn = !!token;
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    toast({ title: "Logged out", description: "See you next time!" });
+    navigate("/login");
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
@@ -16,15 +30,31 @@ const Navbar = () => {
         </Link>
 
         <div className="flex items-center gap-1">
-          <Button variant="ghost" asChild>
-            <Link to="/learn">Learn</Link>
-          </Button>
-          <Button variant="ghost" asChild>
-            <Link to="/login">Log in</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/register">Get Started</Link>
-          </Button>
+          {isLoggedIn ? (
+            <>
+              <Button variant="ghost" asChild>
+                <Link to="/learn">Learn</Link>
+              </Button>
+              {role === "ADMIN" && (
+                <Button variant="ghost" asChild>
+                  <Link to="/admin">Admin</Link>
+                </Button>
+              )}
+              <Button variant="ghost" onClick={handleLogout} className="flex items-center gap-2">
+                <LogOut className="w-4 h-4" />
+                Log out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link to="/login">Log in</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/register">Get Started</Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </nav>
