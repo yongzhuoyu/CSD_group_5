@@ -58,22 +58,6 @@ public class ContentService {
         return contentRepository.findByStatus("PENDING");
     }
 
-    // // ADMIN: Approve a piece of content
-    // public Content approveContent(UUID contentId) {
-    // Content content = contentRepository.findById(contentId)
-    // .orElseThrow(() -> new RuntimeException("Content not found"));
-    // content.setStatus("APPROVED");
-    // return contentRepository.save(content);
-    // }
-
-    // // ADMIN: Reject a piece of content
-    // public Content rejectContent(UUID contentId) {
-    // Content content = contentRepository.findById(contentId)
-    // .orElseThrow(() -> new RuntimeException("Content not found"));
-    // content.setStatus("REJECTED");
-    // return contentRepository.save(content);
-    // }
-
     // ADMIN: Approve a piece of content
     public Content approveContent(UUID contentId) {
         Content content = contentRepository.findById(contentId)
