@@ -1,0 +1,16 @@
+{
+  "name": "csd-group-5",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm --prefix src/main/java/com/genbridge/user_interface install",
+    "ui:install": "npm --prefix src/main/java/com/genbridge/user_interface install",
+    "ui:dev": "npm --prefix src/main/java/com/genbridge/user_interface run dev",
+    "ui:build": "npm --prefix src/main/java/com/genbridge/user_interface run build",
+    "ui:test": "npm --prefix src/main/java/com/genbridge/user_interface run test",
+    "backend:dev": "./mvnw spring-boot:run",
+    "dev": "concurrently -k -n backend,ui -c blue,green \"./mvnw spring-boot:run\" \"npm --prefix src/main/java/com/genbridge/user_interface run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}
