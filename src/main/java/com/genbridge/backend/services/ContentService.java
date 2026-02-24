@@ -90,4 +90,10 @@ public class ContentService {
                 .orElseThrow(() -> new RuntimeException("Content not found"));
         contentRepository.delete(content);
     }
+
+    public List<Content> getMySubmissions(String contributorEmail) {
+    User contributor = userRepository.findByEmail(contributorEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    return contentRepository.findByContributor_Id(contributor.getId());
+    }
 }

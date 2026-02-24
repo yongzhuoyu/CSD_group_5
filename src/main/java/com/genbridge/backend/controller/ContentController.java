@@ -79,4 +79,11 @@ public class ContentController {
         contentService.deleteContent(contentId);
         return ResponseEntity.noContent().build();
     }
+
+    // LEARNER: Get all content submitted by the current logged-in user
+    @GetMapping("/my-submissions")
+    public ResponseEntity<List<Content>> getMySubmissions(
+        @AuthenticationPrincipal User currentUser) {
+    return ResponseEntity.ok(contentService.getMySubmissions(currentUser.getEmail()));
+    }
 }
