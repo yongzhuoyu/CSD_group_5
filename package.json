@@ -2,6 +2,7 @@
   "name": "csd-group-5",
   "private": true,
   "scripts": {
+    "postinstall": "npm --prefix src/main/java/com/genbridge/user_interface install",
     "ui:install": "npm --prefix src/main/java/com/genbridge/user_interface install",
     "ui:dev": "npm --prefix src/main/java/com/genbridge/user_interface run dev",
     "ui:build": "npm --prefix src/main/java/com/genbridge/user_interface run build",
