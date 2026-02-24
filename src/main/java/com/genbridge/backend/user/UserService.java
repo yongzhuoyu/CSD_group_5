@@ -27,7 +27,7 @@ public class UserService {
             throw new IllegalArgumentException("Email is already registered.");
         }
         String hashedPassword = passwordEncoder.encode(request.getPassword());
-        User user = new User(request.getEmail(), hashedPassword, "LEARNER");
+        User user = new User(request.getName(), request.getEmail(), hashedPassword, "LEARNER");
         userRepository.save(user);
     }
 

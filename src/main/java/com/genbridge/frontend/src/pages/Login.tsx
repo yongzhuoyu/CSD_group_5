@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,14 +11,34 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Login submitted",
-      description: "Backend authentication coming soon!",
-    });
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.role);
+        toast({ title: "Welcome back!", description: "Login successful." });
+        navigate("/learn");
+      } else {
+        const msg = await res.text();
+        toast({ title: "Login failed", description: msg, variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Error", description: "Could not reach the server.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,8 +77,8 @@ const Login = () => {
           </div>
         </div>
 
-        <Button type="submit" className="w-full" size="lg">
-          Log in
+        <Button type="submit" className="w-full" size="lg" disabled={loading}>
+          {loading ? "Logging in..." : "Log in"}
         </Button>
 
         <p className="text-center text-sm text-muted-foreground">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,14 +12,31 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Account created!",
-      description: "Backend authentication coming soon!",
-    });
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+      const data = await res.text();
+      if (res.ok) {
+        toast({ title: "Account created!", description: "You can now log in." });
+        navigate("/login");
+      } else {
+        toast({ title: "Registration failed", description: data, variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Error", description: "Could not reach the server.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -71,8 +88,8 @@ const Register = () => {
           </div>
         </div>
 
-        <Button type="submit" className="w-full" size="lg">
-          Create account
+        <Button type="submit" className="w-full" size="lg" disabled={loading}>
+          {loading ? "Creating account..." : "Create account"}
         </Button>
 
         <p className="text-center text-sm text-muted-foreground">

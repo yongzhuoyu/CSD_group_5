@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class RegistrationRequest {
+    @NotBlank(message = "Name is required")
+    private String name;
+
     @Email(message = "Invalid email format")
     @NotBlank(message = "Email is required")
     private String email;
@@ -15,9 +18,18 @@ public class RegistrationRequest {
 
     public RegistrationRequest() {}
 
-    public RegistrationRequest(String email, String password) {
+    public RegistrationRequest(String name, String email, String password) {
+        this.name = name;
         this.email = email;
         this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {

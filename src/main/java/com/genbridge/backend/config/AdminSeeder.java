@@ -31,7 +31,7 @@ public class AdminSeeder implements ApplicationRunner {
             return; // Admin already exists, nothing to do
         }
 
-        User admin = new User(adminEmail, passwordEncoder.encode(adminPassword), "ADMIN");
+        User admin = new User("Admin", adminEmail, passwordEncoder.encode(adminPassword), "ADMIN");
         userRepository.save(admin);
         System.out.println("Default admin account created: " + adminEmail);
     }
