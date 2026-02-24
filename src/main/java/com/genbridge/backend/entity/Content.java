@@ -1,5 +1,6 @@
 package com.genbridge.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.genbridge.backend.user.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public class Content {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contributor_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private User contributor;
 
     @Column(nullable = false)
