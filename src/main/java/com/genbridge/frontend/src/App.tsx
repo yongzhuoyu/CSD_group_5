@@ -11,8 +11,14 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Redirects to /login if no token
 const PrivateRoute = ({ element }: { element: JSX.Element }) => {
   return localStorage.getItem("token") ? element : <Navigate to="/login" replace />;
+};
+
+// Redirects to /learn if already logged in
+const PublicOnlyRoute = ({ element }: { element: JSX.Element }) => {
+  return localStorage.getItem("token") ? <Navigate to="/learn" replace /> : element;
 };
 
 const App = () => (
@@ -23,8 +29,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<PublicOnlyRoute element={<Login />} />} />
+          <Route path="/register" element={<PublicOnlyRoute element={<Register />} />} />
           <Route path="/learn" element={<PrivateRoute element={<Learn />} />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
