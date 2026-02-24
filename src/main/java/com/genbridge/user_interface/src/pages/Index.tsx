@@ -47,9 +47,6 @@ const Index = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-6">
-                <Zap className="w-4 h-4" /> Now in Beta
-              </span>
               <h1 className="font-display text-5xl md:text-6xl font-bold text-foreground leading-tight mb-6">
                 Speak fluent{" "}
                 <span className="text-primary">Gen&nbsp;Alpha</span>
