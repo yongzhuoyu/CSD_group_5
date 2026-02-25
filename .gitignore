@@ -55,6 +55,10 @@ coverage/
 *.swp
 *~.nib
 
+# Node.js / npm
+node_modules/
+package-lock.json
+
 # Frontend workspace artifacts
 src/main/java/com/genbridge/frontend/node_modules/
 src/main/java/com/genbridge/frontend/dist/
