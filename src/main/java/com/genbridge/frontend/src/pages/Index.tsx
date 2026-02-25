@@ -34,6 +34,8 @@ const features = [
 ];
 
 const Index = () => {
+  const isLoggedIn = !!localStorage.getItem("token");
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -61,9 +63,11 @@ const Index = () => {
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link to="/login">I have an account</Link>
-                </Button>
+                {!isLoggedIn && (
+                  <Button size="lg" variant="outline" asChild>
+                    <Link to="/login">I have an account</Link>
+                  </Button>
+                )}
               </div>
             </motion.div>
           </div>
@@ -96,29 +100,31 @@ const Index = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-3xl bg-primary p-12 text-center"
-          >
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
-              Ready to get fluent?
-            </h2>
-            <p className="text-primary-foreground/70 mb-8 max-w-md mx-auto">
-              Join thousands of curious learners bridging the generational gap. It's free to start.
-            </p>
-            <Button size="lg" variant="secondary" asChild>
-              <Link to="/register">
-                Create Free Account
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
-          </motion.div>
-        </div>
-      </section>
+      {!isLoggedIn && (
+        <section className="py-20 px-4">
+          <div className="container mx-auto max-w-3xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="rounded-3xl bg-primary p-12 text-center"
+            >
+              <h2 className="font-display text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
+                Ready to get fluent?
+              </h2>
+              <p className="text-primary-foreground/70 mb-8 max-w-md mx-auto">
+                Join thousands of curious learners bridging the generational gap. It's free to start.
+              </p>
+              <Button size="lg" variant="secondary" asChild>
+                <Link to="/register">
+                  Create Free Account
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              </Button>
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* Footer */}
       <footer className="border-t border-border py-8 px-4">
