@@ -7,6 +7,7 @@ const Navbar = () => {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
   const isLoggedIn = !!token;
+
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -30,23 +31,54 @@ const Navbar = () => {
         </Link>
 
         <div className="flex items-center gap-1">
-          {isLoggedIn ? (
+          {isLoggedIn ?
             <>
-              <Button variant="ghost" asChild>
-                <Link to="/learn">Learn</Link>
-              </Button>
-              {role === "ADMIN" && (
-                <Button variant="ghost" asChild>
-                  <Link to="/admin">Admin</Link>
-                </Button>
+              {/* LEARNER UI */}
+              {role === "LEARNER" && (
+                <>
+                  <Button variant="ghost" asChild>
+                    <Link to="/learn">Learn</Link>
+                  </Button>
+                  <Button variant="ghost" asChild>
+                    <Link to="/create">Create</Link>
+                  </Button>
+                  <Button variant="ghost" asChild>
+                    <Link to="/my-content">My Content</Link>
+                  </Button>
+                </>
               )}
-              <Button variant="ghost" onClick={handleLogout} className="flex items-center gap-2">
+
+              {/* ADMIN UI */}
+              {role === "ADMIN" && (
+                <>
+                  <Button variant="ghost" asChild>
+                    <Link to="/learn">Learn</Link>
+                  </Button>
+                  <Button variant="ghost" asChild>
+                    <Link to="/admin/">Dashboard</Link>
+                  </Button>
+                  <Button variant="ghost" asChild>
+                    <Link to="/admin/pending">Pending</Link>
+                  </Button>
+                  <Button variant="ghost" asChild>
+                    <Link to="/admin/approved">Approved</Link>
+                  </Button>
+                  <Button variant="ghost" asChild>
+                    <Link to="/admin/rejected">Rejected</Link>
+                  </Button>
+                </>
+              )}
+
+              <Button
+                variant="ghost"
+                onClick={handleLogout}
+                className="flex items-center gap-2"
+              >
                 <LogOut className="w-4 h-4" />
                 Log out
               </Button>
             </>
-          ) : (
-            <>
+          : <>
               <Button variant="ghost" asChild>
                 <Link to="/login">Log in</Link>
               </Button>
@@ -54,7 +86,7 @@ const Navbar = () => {
                 <Link to="/register">Get Started</Link>
               </Button>
             </>
-          )}
+          }
         </div>
       </div>
     </nav>

@@ -3,23 +3,40 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Learn from "./pages/Learn";
 import NotFound from "./pages/NotFound";
+import CreateContent from "./pages/CreateContent";
+import MyContent from "./pages/MyContent";
+import AdminLayout from "./pages/AdminLayout";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminPending from "./pages/AdminPending";
+import AdminApproved from "./pages/AdminApproved";
+import AdminRejected from "./pages/AdminRejected";
 
 const queryClient = new QueryClient();
 
 // Redirects to /login if no token
 const PrivateRoute = ({ element }: { element: JSX.Element }) => {
-  return localStorage.getItem("token") ? element : <Navigate to="/login" replace />;
+  return localStorage.getItem("token") ? element : (
+      <Navigate to="/login" replace />
+    );
 };
 
 // Redirects to /learn if already logged in
 const PublicOnlyRoute = ({ element }: { element: JSX.Element }) => {
-  return localStorage.getItem("token") ? <Navigate to="/learn" replace /> : element;
+  return localStorage.getItem("token") ?
+      <Navigate to="/learn" replace />
+    : element;
 };
 
 // Intercepts 401 responses anywhere in the app and logs the user out
@@ -52,9 +69,28 @@ const App = () => (
         <TokenExpiryHandler />
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/login" element={<PublicOnlyRoute element={<Login />} />} />
-          <Route path="/register" element={<PublicOnlyRoute element={<Register />} />} />
+          <Route
+            path="/login"
+            element={<PublicOnlyRoute element={<Login />} />}
+          />
+          <Route path="/my-content" element={<MyContent />} />
+          <Route
+            path="/register"
+            element={<PublicOnlyRoute element={<Register />} />}
+          />
+          {/* <Route path="/create" element={<CreateContent />} />
           <Route path="/learn" element={<PrivateRoute element={<Learn />} />} />
+          <Route path="/lesson/:id" element={<Learn />} /> */}
+          <Route path="/learn" element={<PrivateRoute element={<Learn />} />} />
+          <Route path="/lesson/:id" element={<Learn />} />
+          <Route path="/create" element={<CreateContent />} />
+          <Route path="/edit/:id" element={<CreateContent />} />
+          <Route path="/my-content" element={<MyContent />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/pending" element={<AdminPending />} />
+          <Route path="/admin/approved" element={<AdminApproved />} />
+          <Route path="/admin/rejected" element={<AdminRejected />} />
+
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

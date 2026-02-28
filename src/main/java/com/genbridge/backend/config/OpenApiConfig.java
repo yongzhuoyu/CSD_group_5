@@ -16,23 +16,23 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
-    @Bean
-    public OpenAPI genBridgeOpenAPI() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("GenBridge API")
-                        .description("Self-Learning Platform for Gen-Alpha Culture - RESTful API Documentation")
-                        .version("v1.0")
-                        .contact(new Contact()
-                                .name("GenBridge Team")
-                                .email("team@genbridge.com")))
-                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
-                .components(new Components()
-                        .addSecuritySchemes("Bearer Authentication",
-                                new SecurityScheme()
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")
-                                        .description("Enter JWT token")));
-    }
+        @Bean
+        public OpenAPI genBridgeOpenAPI() {
+                return new OpenAPI()
+                                .info(new Info()
+                                                .title("GenBridge API")
+                                                .description("Self-Learning Platform for Gen-Alpha Culture - RESTful API Documentation")
+                                                .version("v1.0")
+                                                .contact(new Contact()
+                                                                .name("GenBridge Team")
+                                                                .email("team@genbridge.com")))
+                                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
+                                .components(new Components()
+                                                .addSecuritySchemes("Bearer Authentication",
+                                                                new SecurityScheme()
+                                                                                .type(SecurityScheme.Type.HTTP)
+                                                                                .scheme("bearer")
+                                                                                .bearerFormat("JWT")
+                                                                                .description("Enter JWT token")));
+        }
 }

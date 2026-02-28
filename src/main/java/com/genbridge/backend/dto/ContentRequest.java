@@ -1,16 +1,40 @@
 package com.genbridge.backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 
-@Data
 public class ContentRequest {
-    @NotBlank(message = "Title is required")
+
+    @NotBlank
     private String title;
 
-    @NotBlank(message = "Description is required")
-    private String description;
+    private boolean submit;
 
-    @NotBlank(message = "Term is required")
+    @NotBlank
     private String term;
+
+    @NotBlank
+    private String categorySlug;
+
+    @NotBlank
+    private String body;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getTerm() {
+        return term;
+    }
+
+    public String getCategorySlug() {
+        return categorySlug;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public boolean isSubmit() {
+        return submit;
+    }
 }
