@@ -1,6 +1,7 @@
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sparkles, LogOut } from "lucide-react";
+import { Sparkles, LogOut, Flame, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
@@ -9,6 +10,18 @@ const Navbar = () => {
   const isLoggedIn = !!token;
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const [streak, setStreak] = useState(() => parseInt(localStorage.getItem("gb_streak") ?? "0"));
+  const [xp, setXp] = useState(() => parseInt(localStorage.getItem("gb_xp") ?? "0"));
+
+  useEffect(() => {
+    const sync = () => {
+      setStreak(parseInt(localStorage.getItem("gb_streak") ?? "0"));
+      setXp(parseInt(localStorage.getItem("gb_xp") ?? "0"));
+    };
+    window.addEventListener("gb_progress", sync);
+    return () => window.removeEventListener("gb_progress", sync);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -29,9 +42,19 @@ const Navbar = () => {
           </span>
         </Link>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {isLoggedIn ? (
             <>
+              {streak > 0 && (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20">
+                  <Flame className="w-4 h-4 text-orange-500" />
+                  <span className="text-sm font-bold text-orange-500">{streak}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+                <Star className="w-4 h-4 text-primary" />
+                <span className="text-sm font-bold text-primary">{xp} XP</span>
+              </div>
               <Button variant="ghost" asChild>
                 <Link to="/learn">Learn</Link>
               </Button>

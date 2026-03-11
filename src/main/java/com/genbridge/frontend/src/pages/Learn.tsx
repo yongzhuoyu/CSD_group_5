@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +15,13 @@ import {
   Clock,
   Star,
   ArrowLeft,
+  Sparkles,
+  HelpCircle,
+  Zap,
 } from "lucide-react";
+import { useUserProgress } from "@/hooks/useUserProgress";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Lesson {
   id: string;
@@ -40,6 +46,16 @@ interface Module {
   lessons: Lesson[];
 }
 
+interface QuizData {
+  question: string;
+  correct: string;
+  options: string[];
+}
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const XP_MAP: Record<string, number> = { Beginner: 10, Intermediate: 15, Advanced: 20 };
+
 const iconColorMap = {
   primary: "bg-primary/10 text-primary",
   coral: "bg-coral/10 text-coral",
@@ -52,6 +68,8 @@ const badgeColorMap = {
   Intermediate: "bg-primary/15 text-primary border-primary/30",
   Advanced: "bg-coral/15 text-coral border-coral/30",
 };
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
 
 const modules: Module[] = [
   {
@@ -198,7 +216,7 @@ const modules: Module[] = [
             },
           ],
           keyTerms: [
-            { term: "Brainrot", definition: "When excessive internet consumption makes your humor incomprehensible" },
+            { term: "Brainrot", definition: "When excessive internet consumption makes your humor incomprehensible to outsiders" },
             { term: "Irony poisoning", definition: "Being so ironic that sincerity becomes difficult" },
             { term: "Shitposting", definition: "Deliberately posting low-quality or absurd content for humor" },
           ],
@@ -242,7 +260,7 @@ const modules: Module[] = [
           keyTerms: [
             { term: "Robux", definition: "Roblox's virtual currency, often treated as real money by young users" },
             { term: "Skin", definition: "A cosmetic character appearance in games, often a status symbol" },
-            { term: "Default", definition: "Using the basic/free character skin — can imply being a beginner" },
+            { term: "Default", definition: "Using the basic/free character skin — can imply being a beginner or uncool" },
           ],
           examples: [
             "\"He's such a default\" — He's basic or hasn't invested effort into customization.",
@@ -279,8 +297,8 @@ const modules: Module[] = [
           ],
           keyTerms: [
             { term: "Sound", definition: "An audio clip on TikTok that can be reused by any creator" },
-            { term: "Trending sound", definition: "An audio clip currently being widely used in new content" },
-            { term: "Original sound", definition: "Audio created by the poster rather than reused" },
+            { term: "Trending sound", definition: "An audio clip currently being widely used in new TikTok content" },
+            { term: "Original sound", definition: "Audio created by the poster rather than reused from another video" },
           ],
           examples: [
             "\"Use this sound\" — Participate in a trend by creating content with this specific audio.",
@@ -292,32 +310,219 @@ const modules: Module[] = [
   },
 ];
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const getDailyTerm = (): { term: string; definition: string; moduleName: string } => {
+  const all = modules.flatMap((m) =>
+    m.lessons.flatMap((l) =>
+      l.content.keyTerms.map((kt) => ({ ...kt, moduleName: m.title }))
+    )
+  );
+  const idx = Math.floor(Date.now() / 86_400_000) % all.length;
+  return all[idx];
+};
+
+const generateQuiz = (lesson: Lesson): QuizData | null => {
+  const { keyTerms } = lesson.content;
+  if (keyTerms.length === 0) return null;
+  const correct = keyTerms[Math.floor(Math.random() * keyTerms.length)];
+  const pool = modules
+    .flatMap((m) => m.lessons.flatMap((l) => l.content.keyTerms))
+    .filter((t) => t.definition !== correct.definition);
+  const distractors = [...pool]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3)
+    .map((t) => t.definition);
+  const options = [correct.definition, ...distractors].sort(() => Math.random() - 0.5);
+  return { question: `What does "${correct.term}" mean?`, correct: correct.definition, options };
+};
+
+// ─── XP Celebration Overlay ───────────────────────────────────────────────────
+
+function XPCelebration({ xp, onClose }: { xp: number; onClose: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 3500);
+    return () => clearTimeout(t);
+  }, [onClose]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.5, y: 50 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.8, opacity: 0 }}
+        transition={{ type: "spring", bounce: 0.45 }}
+        className="bg-card rounded-3xl p-12 text-center shadow-2xl border border-primary/20 max-w-xs w-full mx-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <motion.div
+          animate={{ rotate: [0, -12, 12, -8, 8, 0], scale: [1, 1.25, 1] }}
+          transition={{ duration: 0.7 }}
+          className="text-6xl mb-4 select-none"
+        >
+          🏆
+        </motion.div>
+        <h2 className="font-display text-2xl font-bold text-foreground mb-1">Lesson Complete!</h2>
+        <p className="text-muted-foreground text-sm mb-4">Keep the streak alive!</p>
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.25, type: "spring", bounce: 0.6 }}
+          className="flex items-center justify-center gap-2 mb-6"
+        >
+          <Zap className="w-8 h-8 text-primary" />
+          <span className="font-display text-5xl font-bold text-primary">+{xp} XP</span>
+        </motion.div>
+        <Button onClick={onClose} className="w-full">
+          Continue
+        </Button>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 const Learn = () => {
+  const { xp, completedLessons, completeLesson } = useUserProgress();
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
-  const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
+  const [quiz, setQuiz] = useState<QuizData | null>(null);
+  const [quizAnswer, setQuizAnswer] = useState<string | null>(null);
+  const [showLesson, setShowLesson] = useState(false);
+  const [xpPop, setXpPop] = useState<number | null>(null);
 
-  const markComplete = (lessonId: string) => {
-    setCompletedLessons((prev) => {
-      const next = new Set(prev);
-      next.add(lessonId);
-      return next;
-    });
-  };
-
-  const totalLessons = modules.reduce((acc, m) => acc + m.lessons.length, 0);
+  const dailyTerm = useMemo(() => getDailyTerm(), []);
+  const totalLessons = modules.reduce((a, m) => a + m.lessons.length, 0);
   const overallProgress = totalLessons > 0 ? (completedLessons.size / totalLessons) * 100 : 0;
 
-  // Lesson detail view
-  if (selectedLesson) {
+  const handleLessonClick = (lesson: Lesson) => {
+    const q = generateQuiz(lesson);
+    setSelectedLesson(lesson);
+    setQuiz(q);
+    setQuizAnswer(null);
+    setShowLesson(!q);
+  };
+
+  const handleComplete = () => {
+    if (!selectedLesson) return;
+    const earned = completeLesson(selectedLesson.id, XP_MAP[selectedLesson.difficulty] ?? 10);
+    if (earned > 0) setXpPop(earned);
+  };
+
+  // ── Quiz view ──────────────────────────────────────────────────────────────
+  if (selectedLesson && !showLesson && quiz) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <AnimatePresence>
+          {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
+        </AnimatePresence>
+        <div className="pt-24 pb-16 px-4">
+          <div className="container mx-auto max-w-2xl">
+            <button
+              onClick={() => { setSelectedLesson(null); setQuiz(null); }}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to module
+            </button>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl border border-border bg-card p-8"
+            >
+              <div className="flex items-center gap-2 text-primary mb-1">
+                <HelpCircle className="w-5 h-5" />
+                <span className="text-sm font-semibold uppercase tracking-widest">Quick Check</span>
+              </div>
+              <p className="text-sm text-muted-foreground mb-8">
+                Test yourself before diving in — no pressure!
+              </p>
+
+              <h2 className="font-display text-2xl font-bold text-foreground mb-8">
+                {quiz.question}
+              </h2>
+
+              <div className="space-y-3 mb-8">
+                {quiz.options.map((opt) => {
+                  const isAnswered = !!quizAnswer;
+                  const isCorrect = opt === quiz.correct;
+                  const isChosen = opt === quizAnswer;
+                  let cls =
+                    "w-full text-left rounded-xl border px-5 py-3.5 text-sm transition-all ";
+                  if (!isAnswered) {
+                    cls += "border-border hover:border-primary hover:bg-primary/5 cursor-pointer";
+                  } else if (isCorrect) {
+                    cls += "border-green-500 bg-green-500/10 text-green-700 dark:text-green-400 cursor-not-allowed";
+                  } else if (isChosen) {
+                    cls += "border-red-500 bg-red-500/10 text-red-700 dark:text-red-400 cursor-not-allowed";
+                  } else {
+                    cls += "border-border opacity-40 cursor-not-allowed";
+                  }
+                  return (
+                    <button
+                      key={opt}
+                      disabled={isAnswered}
+                      onClick={() => setQuizAnswer(opt)}
+                      className={cls}
+                    >
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <AnimatePresence>
+                {quizAnswer && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-4"
+                  >
+                    <p
+                      className={`text-sm font-medium ${
+                        quizAnswer === quiz.correct
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {quizAnswer === quiz.correct
+                        ? "🎉 Correct! You're already ahead."
+                        : `Not quite — the answer is: "${quiz.correct}"`}
+                    </p>
+                    <Button onClick={() => setShowLesson(true)} className="w-full">
+                      Continue to Lesson <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Lesson detail view ─────────────────────────────────────────────────────
+  if (selectedLesson && showLesson) {
     const isComplete = completedLessons.has(selectedLesson.id);
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
+        <AnimatePresence>
+          {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
+        </AnimatePresence>
         <div className="pt-24 pb-16 px-4">
           <div className="container mx-auto max-w-3xl">
             <button
-              onClick={() => setSelectedLesson(null)}
+              onClick={() => { setSelectedLesson(null); setShowLesson(false); }}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
             >
               <ArrowLeft className="w-4 h-4" /> Back to module
@@ -331,13 +536,16 @@ const Learn = () => {
                 <span className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Clock className="w-3.5 h-3.5" /> {selectedLesson.duration}
                 </span>
+                <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Zap className="w-3.5 h-3.5 text-primary" />
+                  {XP_MAP[selectedLesson.difficulty]} XP
+                </span>
               </div>
               <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
                 {selectedLesson.title}
               </h1>
               <p className="text-muted-foreground mb-10">{selectedLesson.description}</p>
 
-              {/* Lesson sections */}
               <div className="space-y-8 mb-12">
                 {selectedLesson.content.sections.map((section, i) => (
                   <motion.div
@@ -354,7 +562,6 @@ const Learn = () => {
                 ))}
               </div>
 
-              {/* Key Terms */}
               <div className="rounded-2xl border border-border bg-card p-6 mb-8">
                 <h3 className="font-display text-lg font-semibold text-card-foreground mb-4 flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-primary" /> Key Terms
@@ -369,30 +576,28 @@ const Learn = () => {
                 </div>
               </div>
 
-              {/* Examples */}
               <div className="rounded-2xl border border-border bg-card p-6 mb-10">
                 <h3 className="font-display text-lg font-semibold text-card-foreground mb-4 flex items-center gap-2">
                   <MessageCircle className="w-5 h-5 text-coral" /> Usage Examples
                 </h3>
                 <ul className="space-y-3">
                   {selectedLesson.content.examples.map((ex, i) => (
-                    <li key={i} className="text-foreground/80 leading-relaxed pl-4 border-l-2 border-coral/30">
+                    <li
+                      key={i}
+                      className="text-foreground/80 leading-relaxed pl-4 border-l-2 border-coral/30"
+                    >
                       {ex}
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {/* Complete button */}
               {isComplete ? (
                 <div className="flex items-center gap-2 text-primary font-medium">
                   <CheckCircle2 className="w-5 h-5" /> Lesson completed!
                 </div>
               ) : (
-                <Button
-                  size="lg"
-                  onClick={() => markComplete(selectedLesson.id)}
-                >
+                <Button size="lg" onClick={handleComplete}>
                   <CheckCircle2 className="w-4 h-4 mr-2" /> Mark as Complete
                 </Button>
               )}
@@ -403,7 +608,7 @@ const Learn = () => {
     );
   }
 
-  // Module detail view
+  // ── Module detail view ─────────────────────────────────────────────────────
   if (selectedModule) {
     const moduleCompleted = selectedModule.lessons.filter((l) => completedLessons.has(l.id)).length;
     const moduleProgress = (moduleCompleted / selectedModule.lessons.length) * 100;
@@ -423,11 +628,15 @@ const Learn = () => {
 
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               <div className="flex items-center gap-4 mb-2">
-                <div className={`w-12 h-12 rounded-xl ${iconColorMap[selectedModule.color]} flex items-center justify-center`}>
+                <div
+                  className={`w-12 h-12 rounded-xl ${iconColorMap[selectedModule.color]} flex items-center justify-center`}
+                >
                   <Icon className="w-6 h-6" />
                 </div>
                 <div>
-                  <h1 className="font-display text-3xl font-bold text-foreground">{selectedModule.title}</h1>
+                  <h1 className="font-display text-3xl font-bold text-foreground">
+                    {selectedModule.title}
+                  </h1>
                   <p className="text-muted-foreground">{selectedModule.description}</p>
                 </div>
               </div>
@@ -448,14 +657,24 @@ const Learn = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.05 }}
-                      onClick={() => setSelectedLesson(lesson)}
+                      onClick={() => handleLessonClick(lesson)}
                       className="w-full text-left rounded-xl border border-border bg-card p-5 hover:shadow-md transition-shadow flex items-center gap-4"
                     >
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${done ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                        {done ? <CheckCircle2 className="w-5 h-5" /> : <span className="font-display font-bold">{i + 1}</span>}
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                          done ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {done ? (
+                          <CheckCircle2 className="w-5 h-5" />
+                        ) : (
+                          <span className="font-display font-bold">{i + 1}</span>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-display font-semibold text-card-foreground">{lesson.title}</h3>
+                        <h3 className="font-display font-semibold text-card-foreground">
+                          {lesson.title}
+                        </h3>
                         <p className="text-sm text-muted-foreground truncate">{lesson.description}</p>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
@@ -464,6 +683,9 @@ const Learn = () => {
                         </Badge>
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Clock className="w-3 h-3" /> {lesson.duration}
+                        </span>
+                        <span className="text-xs text-primary flex items-center gap-0.5 font-medium">
+                          <Zap className="w-3 h-3" /> {XP_MAP[lesson.difficulty]}
                         </span>
                         <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       </div>
@@ -478,63 +700,105 @@ const Learn = () => {
     );
   }
 
-  // Module overview
+  // ── Overview (path + slang of day) ─────────────────────────────────────────
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="pt-24 pb-16 px-4">
-        <div className="container mx-auto max-w-5xl">
+        <div className="container mx-auto max-w-lg">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="font-display text-4xl font-bold text-foreground mb-2">Learn</h1>
-            <p className="text-muted-foreground mb-6">
-              Explore curated modules on Gen Alpha language, memes, gaming, and more.
-            </p>
 
-            {/* Overall progress */}
-            <div className="rounded-2xl border border-border bg-card p-5 mb-10 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                <Star className="w-6 h-6" />
+            {/* Header */}
+            <div className="mb-6">
+              <h1 className="font-display text-4xl font-bold text-foreground mb-1">Learn</h1>
+              <p className="text-muted-foreground">Your Gen Alpha crash course awaits.</p>
+            </div>
+
+            {/* XP + Progress bar */}
+            <div className="rounded-2xl border border-border bg-card p-5 mb-6 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <Star className="w-5 h-5" />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-card-foreground">Overall Progress</p>
-                <Progress value={overallProgress} className="h-2 mt-1.5" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1.5">
+                  <p className="text-sm font-medium text-card-foreground">Overall Progress</p>
+                  <span className="text-sm font-bold text-primary">{xp} XP</span>
+                </div>
+                <Progress value={overallProgress} className="h-2" />
               </div>
-              <span className="text-sm font-medium text-muted-foreground">
-                {completedLessons.size}/{totalLessons} lessons
+              <span className="text-sm font-medium text-muted-foreground shrink-0">
+                {completedLessons.size}/{totalLessons}
               </span>
             </div>
 
-            {/* Modules grid */}
-            <div className="grid md:grid-cols-2 gap-6">
+            {/* Slang of the Day */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="rounded-2xl border border-primary/20 bg-primary/5 p-6 mb-10"
+            >
+              <div className="flex items-center gap-2 text-primary mb-3">
+                <Sparkles className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-widest">Slang of the Day</span>
+              </div>
+              <p className="font-display text-3xl font-bold text-foreground mb-2">
+                {dailyTerm.term}
+              </p>
+              <p className="text-muted-foreground leading-relaxed">{dailyTerm.definition}</p>
+              <p className="text-xs text-muted-foreground/60 mt-3">
+                From: {dailyTerm.moduleName}
+              </p>
+            </motion.div>
+
+            {/* Learning Path */}
+            <h2 className="font-display text-lg font-bold text-foreground mb-8 text-center">
+              Your Learning Path
+            </h2>
+
+            <div className="relative flex flex-col items-center gap-10 py-4">
+              {/* Central dashed guide line */}
+              <div className="absolute left-1/2 top-0 bottom-0 w-0 -translate-x-1/2 border-l-2 border-dashed border-border/50 z-0 pointer-events-none" />
+
               {modules.map((mod, i) => {
                 const Icon = mod.icon;
-                const modCompleted = mod.lessons.filter((l) => completedLessons.has(l.id)).length;
+                const done = mod.lessons.filter((l) => completedLessons.has(l.id)).length;
+                const total = mod.lessons.length;
+                const isComplete = done === total;
+                const offset = i % 2 === 0 ? "-translate-x-14" : "translate-x-14";
+
                 return (
                   <motion.button
                     key={mod.id}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.08 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.1, type: "spring", bounce: 0.4 }}
                     onClick={() => setSelectedModule(mod)}
-                    className="text-left rounded-2xl border border-border bg-card p-6 hover:shadow-lg transition-shadow group"
+                    className={`relative z-10 flex flex-col items-center gap-2.5 group transform ${offset}`}
                   >
-                    <div className={`w-12 h-12 rounded-xl ${iconColorMap[mod.color]} flex items-center justify-center mb-4`}>
-                      <Icon className="w-6 h-6" />
+                    <div
+                      className={`relative w-20 h-20 rounded-2xl ${iconColorMap[mod.color]} flex items-center justify-center shadow-lg border-2 group-hover:scale-110 transition-transform ${
+                        isComplete ? "border-primary" : "border-transparent"
+                      }`}
+                    >
+                      <Icon className="w-9 h-9" />
+                      {isComplete && (
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center shadow">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground" />
+                        </div>
+                      )}
                     </div>
-                    <h2 className="font-display text-xl font-semibold text-card-foreground mb-1 group-hover:text-primary transition-colors">
+                    <p className="font-display font-bold text-sm text-center max-w-[110px] leading-tight text-foreground group-hover:text-primary transition-colors">
                       {mod.title}
-                    </h2>
-                    <p className="text-sm text-muted-foreground mb-4">{mod.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">
-                        {mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""} · {modCompleted} done
-                      </span>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
+                    </p>
+                    <span className="text-xs text-muted-foreground">
+                      {done}/{total} done
+                    </span>
                   </motion.button>
                 );
               })}
             </div>
+
           </motion.div>
         </div>
       </div>
