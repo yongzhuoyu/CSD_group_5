@@ -3,87 +3,46 @@ package com.genbridge.backend.controller;
 import com.genbridge.backend.dto.ContentRequest;
 import com.genbridge.backend.entity.Content;
 import com.genbridge.backend.services.ContentService;
-import com.genbridge.backend.user.User;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/content")
 public class ContentController {
 
-    @Autowired
-    private ContentService contentService;
+    private final ContentService contentService;
 
-    // LEARNER: Save content as draft
-    // contributorId is taken from the JWT token — not from the client
-    @PostMapping("/draft")
-    public ResponseEntity<Map<String, String>> saveDraft(
-            @Valid @RequestBody ContentRequest request,
-            @AuthenticationPrincipal User currentUser) {
-
-        contentService.saveDraft(request, currentUser.getEmail());
-
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Draft saved successfully");
-        return ResponseEntity.ok(response);
+    public ContentController(ContentService contentService) {
+        this.contentService = contentService;
     }
 
-    // LEARNER: Submit content for admin review
-    @PostMapping("/submit")
-    public ResponseEntity<Map<String, String>> submitForReview(
-            @Valid @RequestBody ContentRequest request,
-            @AuthenticationPrincipal User currentUser) {
-
-        contentService.submitForReview(request, currentUser.getEmail());
-
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Content submitted for review");
-        return ResponseEntity.ok(response);
+    // LEARNER: Get all content terms for a lesson
+    @GetMapping("/lesson/{lessonId}")
+    public ResponseEntity<List<Content>> getContentByLesson(@PathVariable Long lessonId) {
+        return ResponseEntity.ok(contentService.getContentByLesson(lessonId));
     }
 
-    // PUBLIC: View all approved content
-    @GetMapping("/approved")
-    public ResponseEntity<List<Content>> getApprovedContent() {
-        return ResponseEntity.ok(contentService.getApprovedContent());
+    // ADMIN: Add a content term to a lesson
+    @PostMapping
+    public ResponseEntity<Content> createContent(@Valid @RequestBody ContentRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(contentService.createContent(request));
     }
 
-    // ADMIN: View all content pending review
-    @GetMapping("/pending")
-    public ResponseEntity<List<Content>> getPendingContent() {
-        return ResponseEntity.ok(contentService.getPendingContent());
+    // ADMIN: Update a content term
+    @PutMapping("/{id}")
+    public ResponseEntity<Content> updateContent(@PathVariable Long id,
+                                                  @Valid @RequestBody ContentRequest request) {
+        return ResponseEntity.ok(contentService.updateContent(id, request));
     }
 
-    // ADMIN: Approve content
-    @PutMapping("/{contentId}/approve")
-    public ResponseEntity<Content> approveContent(@PathVariable UUID contentId) {
-        return ResponseEntity.ok(contentService.approveContent(contentId));
-    }
-
-    // ADMIN: Reject content
-    @PutMapping("/{contentId}/reject")
-    public ResponseEntity<Content> rejectContent(@PathVariable UUID contentId) {
-        return ResponseEntity.ok(contentService.rejectContent(contentId));
-    }
-
-    // ADMIN: Delete content
-    @DeleteMapping("/{contentId}")
-    public ResponseEntity<Void> deleteContent(@PathVariable UUID contentId) {
-        contentService.deleteContent(contentId);
+    // ADMIN: Delete a content term
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteContent(@PathVariable Long id) {
+        contentService.deleteContent(id);
         return ResponseEntity.noContent().build();
-    }
-
-    // LEARNER: Get all content submitted by the current logged-in user
-    @GetMapping("/my-submissions")
-    public ResponseEntity<List<Content>> getMySubmissions(
-        @AuthenticationPrincipal User currentUser) {
-    return ResponseEntity.ok(contentService.getMySubmissions(currentUser.getEmail()));
     }
 }

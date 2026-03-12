@@ -1,60 +1,58 @@
 package com.genbridge.backend.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.genbridge.backend.user.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
-@Table(name = "content")
+@Table(name = "content", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"lesson_id", "order_index"})
+})
 public class Content {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "lesson_id", nullable = false)
+    private Long lessonId;
+
+    @Column(nullable = false, length = 200)
     private String title;
+
+    @Column(nullable = false, length = 100)
+    private String term;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
-    private String term;
+    @Column(columnDefinition = "TEXT")
+    private String example;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contributor_id", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
-    private User contributor;
+    @Column(name = "order_index", nullable = false)
+    private int orderIndex;
 
-    @Column(nullable = false)
-    private String status = "DRAFT"; // DRAFT, PENDING, APPROVED, REJECTED
-
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     public Content() {}
 
-    public Content(String title, String description, String term, User contributor) {
-        this.title = title;
-        this.description = description;
-        this.term = term;
-        this.contributor = contributor;
-        this.status = "DRAFT";
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public UUID getId() { return id; }
+    public Long getId() { return id; }
+    public Long getLessonId() { return lessonId; }
+    public void setLessonId(Long lessonId) { this.lessonId = lessonId; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
     public String getTerm() { return term; }
     public void setTerm(String term) { this.term = term; }
-    public User getContributor() { return contributor; }
-    public void setContributor(User contributor) { this.contributor = contributor; }
-    public UUID getContributorId() { return contributor != null ? contributor.getId() : null; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public String getExample() { return example; }
+    public void setExample(String example) { this.example = example; }
+    public int getOrderIndex() { return orderIndex; }
+    public void setOrderIndex(int orderIndex) { this.orderIndex = orderIndex; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }
