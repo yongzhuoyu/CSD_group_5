@@ -3,97 +3,53 @@ package com.genbridge.backend.services;
 import com.genbridge.backend.dto.ContentRequest;
 import com.genbridge.backend.entity.Content;
 import com.genbridge.backend.repository.ContentRepository;
-import com.genbridge.backend.user.User;
-import com.genbridge.backend.user.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
 public class ContentService {
 
-    @Autowired
-    private ContentRepository contentRepository;
+    private final ContentRepository contentRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    public ContentService(ContentRepository contentRepository) {
+        this.contentRepository = contentRepository;
+    }
 
-    // LEARNER: Save content as a draft (not yet submitted for review)
-    public Content saveDraft(ContentRequest request, String contributorEmail) {
-        User contributor = userRepository.findByEmail(contributorEmail)
-                .orElseThrow(() -> new RuntimeException("Contributor not found"));
+    public List<Content> getContentByLesson(Long lessonId) {
+        return contentRepository.findByLessonIdOrderByOrderIndex(lessonId);
+    }
+
+    public Content createContent(ContentRequest request) {
         Content content = new Content();
+        content.setLessonId(request.getLessonId());
         content.setTitle(request.getTitle());
-        content.setDescription(request.getDescription());
         content.setTerm(request.getTerm());
-        content.setContributor(contributor);
-        content.setStatus("DRAFT");
+        content.setDescription(request.getDescription());
+        content.setExample(request.getExample());
+        content.setOrderIndex(request.getOrderIndex());
         return contentRepository.save(content);
     }
 
-    // LEARNER: Submit content for admin review
-    public Content submitForReview(ContentRequest request, String contributorEmail) {
-        User contributor = userRepository.findByEmail(contributorEmail)
-                .orElseThrow(() -> new RuntimeException("Contributor not found"));
-        Content content = new Content();
+    public Content updateContent(Long id, ContentRequest request) {
+        Content content = contentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Content not found"));
         content.setTitle(request.getTitle());
-        content.setDescription(request.getDescription());
         content.setTerm(request.getTerm());
-        content.setContributor(contributor);
-        content.setStatus("PENDING");
+        content.setDescription(request.getDescription());
+        content.setExample(request.getExample());
+        content.setOrderIndex(request.getOrderIndex());
+        content.setUpdatedAt(LocalDateTime.now());
         return contentRepository.save(content);
     }
 
-    // PUBLIC: Get all approved content
-    public List<Content> getApprovedContent() {
-        return contentRepository.findByStatus("APPROVED");
-    }
-
-    // ADMIN: Get all content pending review
-    public List<Content> getPendingContent() {
-        return contentRepository.findByStatus("PENDING");
-    }
-
-    // ADMIN: Approve a piece of content
-    public Content approveContent(UUID contentId) {
-        Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new RuntimeException("Content not found"));
-
-        if (!content.getStatus().equals("PENDING")) {
-            throw new IllegalStateException("Only PENDING content can be approved");
+    public void deleteContent(Long id) {
+        if (!contentRepository.existsById(id)) {
+            throw new IllegalArgumentException("Content not found");
         }
-
-        content.setStatus("APPROVED");
-        return contentRepository.save(content);
-    }
-
-    // ADMIN: Reject a piece of content
-    public Content rejectContent(UUID contentId) {
-        Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new RuntimeException("Content not found"));
-
-        if (!content.getStatus().equals("PENDING")) {
-            throw new IllegalStateException("Only PENDING content can be rejected");
-        }
-
-        content.setStatus("REJECTED");
-        return contentRepository.save(content);
-    }
-
-    // ADMIN: Delete a piece of content
-    public void deleteContent(UUID contentId) {
-        Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new RuntimeException("Content not found"));
-        contentRepository.delete(content);
-    }
-
-    public List<Content> getMySubmissions(String contributorEmail) {
-    User contributor = userRepository.findByEmail(contributorEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-    return contentRepository.findByContributor_Id(contributor.getId());
+        contentRepository.deleteById(id);
     }
 }

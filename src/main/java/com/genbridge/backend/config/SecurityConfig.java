@@ -31,15 +31,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/health/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/content/approved").permitAll()
 
-                // Admin-only endpoints
-                .requestMatchers(HttpMethod.GET, "/api/content/pending").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/content/*/approve").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/content/*/reject").hasRole("ADMIN")
+                // Admin-only content management
+                .requestMatchers(HttpMethod.POST, "/api/content").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/content/*").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/content/*").hasRole("ADMIN")
 
-                // All other content endpoints require any authenticated user
+                // All other endpoints require any authenticated user
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
