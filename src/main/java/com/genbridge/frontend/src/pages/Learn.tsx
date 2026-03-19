@@ -18,6 +18,7 @@ import {
   Sparkles,
   HelpCircle,
   Zap,
+  Search,
 } from "lucide-react";
 import { useUserProgress } from "@/hooks/useUserProgress";
 
@@ -61,6 +62,13 @@ const iconColorMap = {
   coral: "bg-coral/10 text-coral",
   lavender: "bg-lavender/10 text-lavender",
   lime: "bg-lime/10 text-lime",
+};
+
+const headerColorMap = {
+  primary: "bg-primary",
+  coral: "bg-coral",
+  lavender: "bg-lavender",
+  lime: "bg-lime",
 };
 
 const badgeColorMap = {
@@ -397,10 +405,25 @@ const Learn = () => {
   const [quizAnswer, setQuizAnswer] = useState<string | null>(null);
   const [showLesson, setShowLesson] = useState(false);
   const [xpPop, setXpPop] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTag, setSelectedTag] = useState<"All" | "Beginner" | "Intermediate" | "Advanced">("All");
 
   const dailyTerm = useMemo(() => getDailyTerm(), []);
   const totalLessons = modules.reduce((a, m) => a + m.lessons.length, 0);
   const overallProgress = totalLessons > 0 ? (completedLessons.size / totalLessons) * 100 : 0;
+
+  const filteredModules = useMemo(() => {
+    return modules.filter((mod) => {
+      const matchesSearch =
+        searchQuery.trim() === "" ||
+        mod.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        mod.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesTag =
+        selectedTag === "All" ||
+        mod.lessons.some((l) => l.difficulty === selectedTag);
+      return matchesSearch && matchesTag;
+    });
+  }, [searchQuery, selectedTag]);
 
   const handleLessonClick = (lesson: Lesson) => {
     const q = generateQuiz(lesson);
@@ -705,7 +728,7 @@ const Learn = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="pt-24 pb-16 px-4">
-        <div className="container mx-auto max-w-lg">
+        <div className="container mx-auto max-w-5xl">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
 
             {/* Header */}
@@ -714,22 +737,66 @@ const Learn = () => {
               <p className="text-muted-foreground">Your Gen Alpha crash course awaits.</p>
             </div>
 
-            {/* XP + Progress bar */}
-            <div className="rounded-2xl border border-border bg-card p-5 mb-6 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                <Star className="w-5 h-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1.5">
-                  <p className="text-sm font-medium text-card-foreground">Overall Progress</p>
-                  <span className="text-sm font-bold text-primary">{xp} XP</span>
+            {/* Level progress bar */}
+            {(() => {
+              const LEVELS = [
+                { label: "Beginner",     min: 0,  max: 30  },
+                { label: "Intermediate", min: 30, max: 80  },
+                { label: "Advanced",     min: 80, max: 999 },
+              ] as const;
+              const current = LEVELS.findLast((l) => xp >= l.min) ?? LEVELS[0];
+              const isMax = current.label === "Advanced";
+              const progressPct = isMax
+                ? 100
+                : Math.min(((xp - current.min) / (current.max - current.min)) * 100, 100);
+              const xpToNext = isMax ? null : current.max - xp;
+
+              return (
+                <div className="rounded-2xl border border-border bg-card p-5 mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Star className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-semibold text-card-foreground">Current Level</span>
+                    </div>
+                    <span className="text-sm font-bold text-primary">{xp} XP</span>
+                  </div>
+
+                  {/* Tier labels */}
+                  <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
+                    {LEVELS.map((l) => (
+                      <span
+                        key={l.label}
+                        className={`font-medium ${l.label === current.label ? "text-primary" : ""}`}
+                      >
+                        {l.label}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Segmented track */}
+                  <div className="flex gap-1 mb-2">
+                    {LEVELS.map((l) => {
+                      const isPast    = xp >= l.max;
+                      const isCurrent = l.label === current.label;
+                      return (
+                        <div key={l.label} className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                          <div
+                            className="h-full bg-primary rounded-full transition-all duration-500"
+                            style={{ width: isPast ? "100%" : isCurrent ? `${progressPct}%` : "0%" }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <p className="text-xs text-muted-foreground">
+                    {isMax
+                      ? "You've reached the top level!"
+                      : `${xpToNext} XP to ${LEVELS[LEVELS.findIndex((l) => l.label === current.label) + 1].label}`}
+                  </p>
                 </div>
-                <Progress value={overallProgress} className="h-2" />
-              </div>
-              <span className="text-sm font-medium text-muted-foreground shrink-0">
-                {completedLessons.size}/{totalLessons}
-              </span>
-            </div>
+              );
+            })()}
 
             {/* Slang of the Day */}
             <motion.div
@@ -751,53 +818,85 @@ const Learn = () => {
               </p>
             </motion.div>
 
-            {/* Learning Path */}
-            <h2 className="font-display text-lg font-bold text-foreground mb-8 text-center">
-              Your Learning Path
-            </h2>
+            {/* Search + Filter */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search by name or description"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                {(["All", "Beginner", "Intermediate", "Advanced"] as const).map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setSelectedTag(tag)}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium border transition-colors ${
+                      selectedTag === tag
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card text-muted-foreground border-border hover:border-primary hover:text-foreground"
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <div className="relative flex flex-col items-center gap-10 py-4">
-              {/* Central dashed guide line */}
-              <div className="absolute left-1/2 top-0 bottom-0 w-0 -translate-x-1/2 border-l-2 border-dashed border-border/50 z-0 pointer-events-none" />
-
-              {modules.map((mod, i) => {
+            {/* Module Card Grid */}
+            {filteredModules.length === 0 ? (
+              <p className="text-center text-muted-foreground py-16">No modules match your search.</p>
+            ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredModules.map((mod, i) => {
                 const Icon = mod.icon;
                 const done = mod.lessons.filter((l) => completedLessons.has(l.id)).length;
                 const total = mod.lessons.length;
                 const isComplete = done === total;
-                const offset = i % 2 === 0 ? "-translate-x-14" : "translate-x-14";
+                const moduleProgress = (done / total) * 100;
 
                 return (
                   <motion.button
                     key={mod.id}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.1, type: "spring", bounce: 0.4 }}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08 }}
                     onClick={() => setSelectedModule(mod)}
-                    className={`relative z-10 flex flex-col items-center gap-2.5 group transform ${offset}`}
+                    className="rounded-2xl overflow-hidden border border-border bg-card hover:shadow-lg transition-all hover:-translate-y-1 text-left group"
                   >
-                    <div
-                      className={`relative w-20 h-20 rounded-2xl ${iconColorMap[mod.color]} flex items-center justify-center shadow-lg border-2 group-hover:scale-110 transition-transform ${
-                        isComplete ? "border-primary" : "border-transparent"
-                      }`}
-                    >
-                      <Icon className="w-9 h-9" />
+                    {/* Colored header */}
+                    <div className={`${headerColorMap[mod.color]} h-36 flex items-center justify-center relative`}>
+                      <Icon className="w-14 h-14 text-white/90" />
                       {isComplete && (
-                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center shadow">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground" />
+                        <div className="absolute top-3 right-3 w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">
+                          <CheckCircle2 className="w-4 h-4 text-white" />
                         </div>
                       )}
                     </div>
-                    <p className="font-display font-bold text-sm text-center max-w-[110px] leading-tight text-foreground group-hover:text-primary transition-colors">
-                      {mod.title}
-                    </p>
-                    <span className="text-xs text-muted-foreground">
-                      {done}/{total} done
-                    </span>
+
+                    {/* Card body */}
+                    <div className="p-4">
+                      <h3 className="font-display font-bold text-card-foreground mb-1 group-hover:text-primary transition-colors">
+                        {mod.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
+                        {mod.description}
+                      </p>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
+                        <span>{done}/{total} lessons</span>
+                        <span>{Math.round(moduleProgress)}%</span>
+                      </div>
+                      <Progress value={moduleProgress} className="h-1.5" />
+                    </div>
                   </motion.button>
                 );
               })}
             </div>
+            )}
 
           </motion.div>
         </div>
