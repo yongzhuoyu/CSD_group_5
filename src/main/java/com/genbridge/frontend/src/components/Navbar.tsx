@@ -58,6 +58,9 @@ const Navbar = () => {
               <Button variant="ghost" asChild>
                 <Link to="/learn">Learn</Link>
               </Button>
+              <Button variant="ghost" asChild>
+                <Link to="/profile">Profile</Link>
+              </Button>
               {role === "ADMIN" && (
                 <Button variant="ghost" asChild>
                   <Link to="/admin">Admin</Link>

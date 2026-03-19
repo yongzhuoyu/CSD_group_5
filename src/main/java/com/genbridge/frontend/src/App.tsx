@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Learn from "./pages/Learn";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const App = () => (
           <Route path="/login" element={<PublicOnlyRoute element={<Login />} />} />
           <Route path="/register" element={<PublicOnlyRoute element={<Register />} />} />
           <Route path="/learn" element={<PrivateRoute element={<Learn />} />} />
+          <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

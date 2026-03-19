@@ -17,14 +17,14 @@ public class Content {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
     private String term;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contributor_id", nullable = false)
+    @JoinColumn(name = "contributor_id", nullable = true)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private User contributor;
 
