@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/content").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/content/*").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/content/*").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/lessons/*/quiz").hasRole("ADMIN")
 
                 // Public lesson endpoints — learner access, no token needed
                 .requestMatchers(HttpMethod.GET, "/api/lessons").permitAll()
