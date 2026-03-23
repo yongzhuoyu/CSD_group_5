@@ -8,6 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Service
 public class UserService {
 
@@ -45,5 +47,25 @@ public class UserService {
         // Step 3: Credentials are correct — generate and return the JWT token
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
         return new LoginResponse(token, user.getEmail(), user.getRole());
+    }
+
+    @Transactional(readOnly = true)
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    @Transactional
+    public void updateStreak(User user, boolean allAnswersCorrect) {
+        int currentStreak = user.getCurrentStreak();
+
+        if (allAnswersCorrect) {
+            user.setCurrentStreak(currentStreak + 1);
+        } else {
+            user.setCurrentStreak(0);
+        }
+
+        user.setLastActiveDate(LocalDate.now());
+        userRepository.save(user);
     }
 }
