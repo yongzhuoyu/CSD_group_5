@@ -52,7 +52,7 @@ const App = () => (
       <BrowserRouter>
         <TokenExpiryHandler />
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={localStorage.getItem("token") ? <Navigate to="/learn" replace /> : <Index />} />
           <Route path="/login" element={<PublicOnlyRoute element={<Login />} />} />
           <Route path="/register" element={<PublicOnlyRoute element={<Register />} />} />
           <Route path="/learn" element={<PrivateRoute element={<Learn />} />} />

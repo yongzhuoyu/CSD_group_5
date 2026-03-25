@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -19,7 +19,15 @@ import {
   HelpCircle,
   Zap,
   Search,
+  Flame,
+  LogOut,
 } from "lucide-react";
+import HomeIcon from "@/assets/icons/home.svg?react";
+import DictionaryIcon from "@/assets/icons/dictionary.svg?react";
+import AccountIcon from "@/assets/icons/account.svg?react";
+import NoteStackIcon from "@/assets/icons/note_stack.svg?react";
+import BarChartIcon from "@/assets/icons/bar_chart.svg?react";
+import KeepIcon from "@/assets/icons/keep.svg?react";
 import { useUserProgress } from "@/hooks/useUserProgress";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -397,8 +405,15 @@ function XPCelebration({ xp, onClose }: { xp: number; onClose: () => void }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
+const LEVELS = [
+  { label: "Beginner",     min: 0,  max: 30  },
+  { label: "Intermediate", min: 30, max: 80  },
+  { label: "Advanced",     min: 80, max: 999 },
+] as const;
+
 const Learn = () => {
   const { xp, completedLessons, completeLesson } = useUserProgress();
+  const navigate = useNavigate();
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [quiz, setQuiz] = useState<QuizData | null>(null);
@@ -407,6 +422,9 @@ const Learn = () => {
   const [xpPop, setXpPop] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<"All" | "Beginner" | "Intermediate" | "Advanced">("All");
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [currentPage, setCurrentPage] = useState<"home" | "learn">("home");
+  const [streak] = useState(() => parseInt(localStorage.getItem("gb_streak") ?? "0"));
 
   const dailyTerm = useMemo(() => getDailyTerm(), []);
   const totalLessons = modules.reduce((a, m) => a + m.lessons.length, 0);
@@ -425,6 +443,20 @@ const Learn = () => {
     });
   }, [searchQuery, selectedTag]);
 
+  // Derived stats
+  const currentLevel = [...LEVELS].reverse().find((l) => xp >= l.min) ?? LEVELS[0];
+  const isMaxLevel = currentLevel.label === "Advanced";
+  const levelProgressPct = isMaxLevel
+    ? 100
+    : Math.min(((xp - currentLevel.min) / (currentLevel.max - currentLevel.min)) * 100, 100);
+  const xpToNext = isMaxLevel ? null : currentLevel.max - xp;
+  const termsLearned = modules
+    .flatMap((m) => m.lessons)
+    .filter((l) => completedLessons.has(l.id))
+    .reduce((sum, l) => sum + l.content.keyTerms.length, 0);
+  const totalTerms = modules.flatMap((m) => m.lessons).reduce((sum, l) => sum + l.content.keyTerms.length, 0);
+  const completedModulesCount = modules.filter((m) => m.lessons.every((l) => completedLessons.has(l.id))).length;
+
   const handleLessonClick = (lesson: Lesson) => {
     const q = generateQuiz(lesson);
     setSelectedLesson(lesson);
@@ -439,16 +471,113 @@ const Learn = () => {
     if (earned > 0) setXpPop(earned);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/login");
+  };
+
+  const sidebarW = sidebarExpanded ? "w-72" : "w-16";
+  const contentML = sidebarExpanded ? "ml-72" : "ml-16";
+
+  // ── Sidebar ────────────────────────────────────────────────────────────────
+  const sidebar = (
+    <aside className={`fixed top-0 left-0 h-full z-40 bg-card border-r border-border flex flex-col transition-all duration-300 ${sidebarW}`}>
+
+      {/* Header: logo + name + pin (expanded) OR pin-only (collapsed) */}
+      {sidebarExpanded ? (
+        <div className="flex items-center h-16 px-4 border-b border-border shrink-0 gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <span className="font-sidebar text-xl font-bold text-foreground whitespace-nowrap flex-1">GenBridge</span>
+          <button
+            onClick={() => setSidebarExpanded(false)}
+            title="Unpin sidebar"
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-primary hover:bg-primary/10 transition-colors"
+          >
+            <KeepIcon className="w-4 h-4" />
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => setSidebarExpanded(true)}
+          title="Pin sidebar"
+          className="flex items-center justify-center h-16 w-full border-b border-border shrink-0 hover:bg-muted transition-colors"
+        >
+          <KeepIcon className="w-4 h-4 text-muted-foreground" />
+        </button>
+      )}
+
+      {/* Nav */}
+      <nav className="flex-1 p-3 space-y-1 overflow-hidden">
+        {([
+          { icon: HomeIcon,       label: "Home",  page: "home"  as const },
+          { icon: DictionaryIcon, label: "Learn", page: "learn" as const },
+        ]).map(({ icon: Icon, label, page }) => {
+          const isActive = currentPage === page && !selectedModule && !selectedLesson;
+          return (
+            <button
+              key={label}
+              onClick={() => { setCurrentPage(page); setSelectedModule(null); setSelectedLesson(null); setShowLesson(false); }}
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors ${
+                isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              } ${!sidebarExpanded ? "justify-center" : ""}`}
+            >
+              <Icon className="w-6 h-6 shrink-0" />
+              {sidebarExpanded && <span className="whitespace-nowrap">{label}</span>}
+            </button>
+          );
+        })}
+        <Link
+          to="/profile"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
+        >
+          <AccountIcon className="w-6 h-6 shrink-0" />
+          {sidebarExpanded && <span className="whitespace-nowrap">Profile</span>}
+        </Link>
+      </nav>
+
+      {/* Bottom: streak / XP / logout */}
+      <div className="p-3 border-t border-border space-y-1 shrink-0">
+        {sidebarExpanded ? (
+          <div className="flex items-center gap-2 px-3 py-1.5">
+            {streak > 0 && (
+              <span className="flex items-center gap-1 text-orange-500 text-xs font-bold">
+                <Flame className="w-4 h-4" />{streak}
+              </span>
+            )}
+            <span className="flex items-center gap-1 text-primary text-xs font-bold ml-auto">
+              <Star className="w-4 h-4" />{xp} XP
+            </span>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2 py-1">
+            {streak > 0 && <Flame className="w-5 h-5 text-orange-500" />}
+            <Star className="w-5 h-5 text-primary" />
+          </div>
+        )}
+        <button
+          onClick={handleLogout}
+          className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors ${!sidebarExpanded ? "justify-center" : ""}`}
+        >
+          <LogOut className="w-6 h-6 shrink-0" />
+          {sidebarExpanded && <span>Log out</span>}
+        </button>
+      </div>
+    </aside>
+  );
+
   // ── Quiz view ──────────────────────────────────────────────────────────────
   if (selectedLesson && !showLesson && quiz) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
+      <div className="flex min-h-screen bg-background">
+        {sidebar}
         <AnimatePresence>
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
         </AnimatePresence>
-        <div className="pt-24 pb-16 px-4">
-          <div className="container mx-auto max-w-2xl">
+        <div className={`flex-1 transition-all duration-300 ${contentML}`}>
+          <div className="py-12 px-8 max-w-2xl mx-auto">
             <button
               onClick={() => { setSelectedLesson(null); setQuiz(null); }}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
@@ -537,13 +666,13 @@ const Learn = () => {
   if (selectedLesson && showLesson) {
     const isComplete = completedLessons.has(selectedLesson.id);
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
+      <div className="flex min-h-screen bg-background">
+        {sidebar}
         <AnimatePresence>
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
         </AnimatePresence>
-        <div className="pt-24 pb-16 px-4">
-          <div className="container mx-auto max-w-3xl">
+        <div className={`flex-1 transition-all duration-300 ${contentML}`}>
+          <div className="py-12 px-8 max-w-3xl mx-auto">
             <button
               onClick={() => { setSelectedLesson(null); setShowLesson(false); }}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
@@ -638,10 +767,10 @@ const Learn = () => {
     const Icon = selectedModule.icon;
 
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="pt-24 pb-16 px-4">
-          <div className="container mx-auto max-w-4xl">
+      <div className="flex min-h-screen bg-background">
+        {sidebar}
+        <div className={`flex-1 transition-all duration-300 ${contentML}`}>
+          <div className="py-12 px-8 max-w-4xl mx-auto">
             <button
               onClick={() => setSelectedModule(null)}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
@@ -723,142 +852,223 @@ const Learn = () => {
     );
   }
 
-  // ── Overview (path + slang of day) ─────────────────────────────────────────
-  return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <div className="pt-24 pb-16 px-4">
-        <div className="container mx-auto max-w-5xl">
+  // ── Home view ──────────────────────────────────────────────────────────────
+  if (currentPage === "home") {
+    const nextLesson = modules.flatMap((m) => m.lessons).find((l) => !completedLessons.has(l.id));
+    const nextModule = modules.find((m) => m.lessons.some((l) => l.id === nextLesson?.id));
+
+    return (
+      <div className="flex h-screen bg-background overflow-hidden">
+        {sidebar}
+
+        {/* Main content — the only other section */}
+        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-10`}>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
 
-            {/* Header */}
-            <div className="mb-6">
-              <h1 className="font-display text-4xl font-bold text-foreground mb-1">Learn</h1>
-              <p className="text-muted-foreground">Your Gen Alpha crash course awaits.</p>
+            {/* Header + Continue Learning */}
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="font-display text-5xl font-bold text-foreground mb-1">Home</h1>
+                <p className="text-lg text-muted-foreground">Welcome back — let's keep learning.</p>
+              </div>
+              <button
+                onClick={() => setCurrentPage("learn")}
+                className="flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl text-lg font-semibold hover:bg-primary/90 transition-colors"
+              >
+                Continue learning <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Level progress bar */}
-            {(() => {
-              const LEVELS = [
-                { label: "Beginner",     min: 0,  max: 30  },
-                { label: "Intermediate", min: 30, max: 80  },
-                { label: "Advanced",     min: 80, max: 999 },
-              ] as const;
-              const current = LEVELS.findLast((l) => xp >= l.min) ?? LEVELS[0];
-              const isMax = current.label === "Advanced";
-              const progressPct = isMax
-                ? 100
-                : Math.min(((xp - current.min) / (current.max - current.min)) * 100, 100);
-              const xpToNext = isMax ? null : current.max - xp;
+            {/* 2-col grid: My Progress | My Words + Activities */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
-              return (
-                <div className="rounded-2xl border border-border bg-card p-5 mb-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Star className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-semibold text-card-foreground">Current Level</span>
-                    </div>
-                    <span className="text-sm font-bold text-primary">{xp} XP</span>
-                  </div>
-
-                  {/* Tier labels */}
-                  <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
+              {/* My Progress */}
+              <div className="rounded-2xl border border-border bg-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="font-display text-2xl font-semibold text-card-foreground">My progress</h2>
+                  <span className="text-lg font-bold text-primary">{xp} XP</span>
+                </div>
+                <div className="rounded-xl bg-muted/40 p-4 mb-4">
+                  <p className="text-base text-muted-foreground font-medium mb-2">Current level — {currentLevel.label}</p>
+                  <div className="flex justify-between text-base text-muted-foreground mb-1.5">
                     {LEVELS.map((l) => (
-                      <span
-                        key={l.label}
-                        className={`font-medium ${l.label === current.label ? "text-primary" : ""}`}
-                      >
+                      <span key={l.label} className={`font-medium ${l.label === currentLevel.label ? "text-primary" : ""}`}>
                         {l.label}
                       </span>
                     ))}
                   </div>
-
-                  {/* Segmented track */}
-                  <div className="flex gap-1 mb-2">
+                  <div className="flex gap-1 mb-1.5">
                     {LEVELS.map((l) => {
                       const isPast    = xp >= l.max;
-                      const isCurrent = l.label === current.label;
+                      const isCurrent = l.label === currentLevel.label;
                       return (
                         <div key={l.label} className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
                           <div
                             className="h-full bg-primary rounded-full transition-all duration-500"
-                            style={{ width: isPast ? "100%" : isCurrent ? `${progressPct}%` : "0%" }}
+                            style={{ width: isPast ? "100%" : isCurrent ? `${levelProgressPct}%` : "0%" }}
                           />
                         </div>
                       );
                     })}
                   </div>
-
-                  <p className="text-xs text-muted-foreground">
-                    {isMax
-                      ? "You've reached the top level!"
-                      : `${xpToNext} XP to ${LEVELS[LEVELS.findIndex((l) => l.label === current.label) + 1].label}`}
+                  <p className="text-base text-muted-foreground">
+                    {isMaxLevel ? "You've reached the top level!" : `${xpToNext} XP to ${LEVELS[LEVELS.findIndex((l) => l.label === currentLevel.label) + 1].label}`}
                   </p>
                 </div>
-              );
-            })()}
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="rounded-xl bg-muted/40 p-3 text-center">
+                    <p className="font-bold text-4xl text-foreground">{completedLessons.size}</p>
+                    <p className="text-base text-muted-foreground mt-0.5">Lessons done</p>
+                  </div>
+                  <div className="rounded-xl bg-muted/40 p-3 text-center">
+                    <p className="font-bold text-4xl text-foreground">{completedModulesCount}</p>
+                    <p className="text-base text-muted-foreground mt-0.5">Modules done</p>
+                  </div>
+                  <div className="rounded-xl bg-muted/40 p-3 text-center">
+                    <p className="font-bold text-4xl text-primary">{xp}</p>
+                    <p className="text-base text-muted-foreground mt-0.5">Total XP</p>
+                  </div>
+                </div>
+              </div>
 
-            {/* Slang of the Day */}
+              {/* My Words + My Activities stacked */}
+              <div className="space-y-4">
+                <div className="rounded-2xl border border-border bg-card p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <NoteStackIcon className="w-6 h-6 text-primary" />
+                    <span className="font-display text-2xl font-semibold text-card-foreground">My Words</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 text-center">
+                    <div className="rounded-xl bg-primary/5 p-3">
+                      <Star className="w-5 h-5 text-primary mx-auto mb-1" />
+                      <p className="font-bold text-4xl text-foreground leading-none">{termsLearned}</p>
+                      <p className="text-base text-muted-foreground mt-1">Learned</p>
+                    </div>
+                    <div className="rounded-xl bg-muted/40 p-3">
+                      <BookOpen className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
+                      <p className="font-bold text-4xl text-foreground leading-none">{totalTerms - termsLearned}</p>
+                      <p className="text-base text-muted-foreground mt-1">Left</p>
+                    </div>
+                    <div className="rounded-xl bg-muted/40 p-3">
+                      <CheckCircle2 className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
+                      <p className="font-bold text-4xl text-foreground leading-none">{totalTerms}</p>
+                      <p className="text-base text-muted-foreground mt-1">Total</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-border bg-card p-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <BarChartIcon className="w-6 h-6 text-primary" />
+                    <span className="font-display text-2xl font-semibold text-card-foreground">My Activities</span>
+                  </div>
+                  <p className="text-base text-muted-foreground mb-2">Overall progress</p>
+                  <div className="flex items-end gap-2 mb-3">
+                    <span className="font-display text-6xl font-bold text-foreground leading-none">{completedLessons.size}</span>
+                    <span className="text-lg text-muted-foreground mb-1">/ {totalLessons} lessons</span>
+                  </div>
+                  <Progress value={overallProgress} className="h-2" />
+                </div>
+              </div>
+            </div>
+
+            {/* Slang of the Day — full width */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-2xl border border-primary/20 bg-primary/5 p-6 mb-10"
+              className="rounded-2xl border border-primary/20 bg-primary/5 p-6 mb-6"
             >
               <div className="flex items-center gap-2 text-primary mb-3">
                 <Sparkles className="w-4 h-4" />
-                <span className="text-xs font-bold uppercase tracking-widest">Slang of the Day</span>
+                <span className="text-base font-bold uppercase tracking-widest">Slang of the Day</span>
               </div>
-              <p className="font-display text-3xl font-bold text-foreground mb-2">
-                {dailyTerm.term}
-              </p>
-              <p className="text-muted-foreground leading-relaxed">{dailyTerm.definition}</p>
-              <p className="text-xs text-muted-foreground/60 mt-3">
-                From: {dailyTerm.moduleName}
-              </p>
+              <p className="font-display text-5xl font-bold text-foreground mb-2">{dailyTerm.term}</p>
+              <p className="text-lg text-muted-foreground leading-relaxed">{dailyTerm.definition}</p>
+              <p className="text-base text-muted-foreground/60 mt-3">From: {dailyTerm.moduleName}</p>
             </motion.div>
 
-            {/* Search + Filter */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search by name or description"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                />
-              </div>
-              <div className="flex gap-2 flex-wrap">
-                {(["All", "Beginner", "Intermediate", "Advanced"] as const).map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => setSelectedTag(tag)}
-                    className={`px-4 py-2 rounded-xl text-sm font-medium border transition-colors ${
-                      selectedTag === tag
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-card text-muted-foreground border-border hover:border-primary hover:text-foreground"
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Up Next — full width */}
+            {nextLesson && nextModule && (() => {
+              const Icon = nextModule.icon;
+              return (
+                <button
+                  onClick={() => { setCurrentPage("learn"); setSelectedModule(nextModule); }}
+                  className="w-full rounded-2xl border border-border bg-card p-5 flex items-center justify-between hover:shadow-md transition-shadow group"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl ${iconColorMap[nextModule.color]} flex items-center justify-center shrink-0`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-base font-bold uppercase tracking-widest text-muted-foreground mb-0.5">Up Next</p>
+                      <p className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">{nextLesson.title}</p>
+                      <p className="text-base text-muted-foreground">{nextModule.title}</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
+                </button>
+              );
+            })()}
 
-            {/* Module Card Grid */}
-            {filteredModules.length === 0 ? (
-              <p className="text-center text-muted-foreground py-16">No modules match your search.</p>
-            ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          </motion.div>
+        </main>
+      </div>
+    );
+  }
+
+  // ── Learn view (modules) ───────────────────────────────────────────────────
+  return (
+    <div className="flex h-screen bg-background overflow-hidden">
+      {sidebar}
+      <div className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-8`}>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+
+          <div className="mb-6">
+            <h1 className="font-display text-4xl font-bold text-foreground mb-1">Learn</h1>
+            <p className="text-muted-foreground">Your Gen Alpha crash course awaits.</p>
+          </div>
+
+          {/* Search + Filter */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search by name or description"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              {(["All", "Beginner", "Intermediate", "Advanced"] as const).map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setSelectedTag(tag)}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium border transition-colors ${
+                    selectedTag === tag
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-card text-muted-foreground border-border hover:border-primary hover:text-foreground"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Module Card Grid */}
+          {filteredModules.length === 0 ? (
+            <p className="text-center text-muted-foreground py-16">No modules match your search.</p>
+          ) : (
+            <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
               {filteredModules.map((mod, i) => {
                 const Icon = mod.icon;
                 const done = mod.lessons.filter((l) => completedLessons.has(l.id)).length;
                 const total = mod.lessons.length;
                 const isComplete = done === total;
-                const moduleProgress = (done / total) * 100;
-
+                const modProgress = (done / total) * 100;
                 return (
                   <motion.button
                     key={mod.id}
@@ -868,17 +1078,14 @@ const Learn = () => {
                     onClick={() => setSelectedModule(mod)}
                     className="rounded-2xl overflow-hidden border border-border bg-card hover:shadow-lg transition-all hover:-translate-y-1 text-left group"
                   >
-                    {/* Colored header */}
-                    <div className={`${headerColorMap[mod.color]} h-36 flex items-center justify-center relative`}>
-                      <Icon className="w-14 h-14 text-white/90" />
+                    <div className={`${headerColorMap[mod.color]} h-32 flex items-center justify-center relative`}>
+                      <Icon className="w-12 h-12 text-white/90" />
                       {isComplete && (
                         <div className="absolute top-3 right-3 w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">
                           <CheckCircle2 className="w-4 h-4 text-white" />
                         </div>
                       )}
                     </div>
-
-                    {/* Card body */}
                     <div className="p-4">
                       <h3 className="font-display font-bold text-card-foreground mb-1 group-hover:text-primary transition-colors">
                         {mod.title}
@@ -888,18 +1095,16 @@ const Learn = () => {
                       </p>
                       <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
                         <span>{done}/{total} lessons</span>
-                        <span>{Math.round(moduleProgress)}%</span>
+                        <span>{Math.round(modProgress)}%</span>
                       </div>
-                      <Progress value={moduleProgress} className="h-1.5" />
+                      <Progress value={modProgress} className="h-1.5" />
                     </div>
                   </motion.button>
                 );
               })}
             </div>
-            )}
-
-          </motion.div>
-        </div>
+          )}
+        </motion.div>
       </div>
     </div>
   );

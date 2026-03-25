@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         display: ["Montserrat", "sans-serif"],
         body: ["DM Sans", "sans-serif"],
+        sidebar: ["Nunito", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
