@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Flame, Star, BookOpen, CheckCircle2 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import { Flame, Star, BookOpen, CheckCircle2, Pencil, Check, X } from "lucide-react";
+import AppSidebar from "@/components/AppSidebar";
 import { useUserProgress } from "@/hooks/useUserProgress";
+import { useToast } from "@/hooks/use-toast";
 
 // ─── Temporary lesson lookup (replace with API data once api.ts is ready) ─────
 
@@ -39,12 +41,47 @@ function getInitials(name: string) {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+function decodeToken(): { email: string; name: string } {
+  try {
+    const token = localStorage.getItem("token") ?? "";
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const email = payload.sub ?? payload.email ?? "";
+    // Derive a display name from the email username part
+    const name = email
+      ? email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
+      : "Learner";
+    return { email, name };
+  } catch {
+    return { email: "", name: "Learner" };
+  }
+}
+
 const Profile = () => {
   const { xp, streak, completedLessons } = useUserProgress();
+  const { toast } = useToast();
+  const decoded = decodeToken();
 
-  // TODO: replace with real user data from GET /api/profile once api.ts is ready
-  const name  = "Your Name";
-  const email = "your@email.com";
+  const [name,  setName]  = useState(decoded.name);
+  const [email, setEmail] = useState(decoded.email);
+
+  const [editingName,  setEditingName]  = useState(false);
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [draftName,  setDraftName]  = useState(name);
+  const [draftEmail, setDraftEmail] = useState(email);
+  const [saving, setSaving] = useState(false);
+
+  const save = (field: "name" | "email") => {
+    setSaving(true);
+    if (field === "name")  { setName(draftName);   setEditingName(false);  }
+    if (field === "email") { setEmail(draftEmail);  setEditingEmail(false); }
+    toast({ title: "Saved", description: `${field === "name" ? "Username" : "Email"} updated.` });
+    setSaving(false);
+  };
+
+  const cancel = (field: "name" | "email") => {
+    if (field === "name")  { setDraftName(name);   setEditingName(false);  }
+    if (field === "email") { setDraftEmail(email);  setEditingEmail(false); }
+  };
 
   const completedList = [...completedLessons]
     .map((id) => ({ id, ...LESSON_LOOKUP[id] }))
@@ -59,11 +96,11 @@ const Profile = () => {
   const nextLevel = isMax ? null : LEVELS[LEVELS.findIndex((l) => l.label === current.label) + 1];
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <Navbar />
+    <div className="flex min-h-screen" style={{ backgroundColor: "#efebe1" }}>
+      <AppSidebar activePage="profile" />
 
-      <div className="pt-28 pb-16 px-4">
-        <div className="container mx-auto max-w-3xl">
+      <div className="flex-1 ml-72 pt-12 pb-16 px-8">
+        <div className="max-w-3xl mx-auto">
 
           {/* Page title */}
           <motion.h1
@@ -81,16 +118,61 @@ const Profile = () => {
             transition={{ delay: 0.05 }}
             className="bg-card rounded-2xl border border-border mb-6 overflow-hidden"
           >
-            {/* Avatar + name row */}
-            <div className="flex items-center gap-5 p-6 border-b border-border">
+            {/* Avatar + editable fields */}
+            <div className="flex items-start gap-5 p-6 border-b border-border">
               <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center shrink-0 shadow">
                 <span className="font-display text-xl font-bold text-primary-foreground">
                   {getInitials(name)}
                 </span>
               </div>
-              <div>
-                <h2 className="font-display text-xl font-bold text-card-foreground">{name}</h2>
-                <p className="text-sm text-muted-foreground">{email}</p>
+              <div className="flex-1 space-y-3">
+                {/* Username */}
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Username</p>
+                  {editingName ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        className="flex-1 px-3 py-1.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                        value={draftName}
+                        onChange={(e) => setDraftName(e.target.value)}
+                        autoFocus
+                      />
+                      <button onClick={() => save("name")} className="text-primary hover:opacity-70"><Check className="w-4 h-4" /></button>
+                      <button onClick={() => cancel("name")} className="text-muted-foreground hover:opacity-70"><X className="w-4 h-4" /></button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <h2 className="font-display text-xl font-bold text-card-foreground">{name}</h2>
+                      <button onClick={() => { setDraftName(name); setEditingName(true); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {/* Email */}
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Email</p>
+                  {editingEmail ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="email"
+                        className="flex-1 px-3 py-1.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                        value={draftEmail}
+                        onChange={(e) => setDraftEmail(e.target.value)}
+                        autoFocus
+                      />
+                      <button onClick={() => save("email")} className="text-primary hover:opacity-70"><Check className="w-4 h-4" /></button>
+                      <button onClick={() => cancel("email")} className="text-muted-foreground hover:opacity-70"><X className="w-4 h-4" /></button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground">{email}</p>
+                      <button onClick={() => { setDraftEmail(email); setEditingEmail(true); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -200,5 +282,6 @@ const Profile = () => {
     </div>
   );
 };
+
 
 export default Profile;
