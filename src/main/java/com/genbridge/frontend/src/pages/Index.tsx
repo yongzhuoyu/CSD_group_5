@@ -89,7 +89,7 @@ const Index = () => {
             </span>
             <span className="block" style={{ marginLeft: "2.4rem" }}>is saying.</span>
           </h1>
-          <p className="text-base mb-8 leading-relaxed" style={{ color: "#4A4A4A", marginLeft: "2.4rem" }}>
+          <p className="text-lg mb-8 leading-relaxed" style={{ color: "#4A4A4A", marginLeft: "2.4rem" }}>
             From "rizz" to "sigma" — learn the slang, memes, and culture your kids, students, or coworkers are speaking fluently.
           </p>
           <div className="flex flex-wrap gap-3" style={{ marginLeft: "2.4rem" }}>
@@ -125,12 +125,12 @@ const Index = () => {
           >
             <div className="flex items-center justify-center gap-2 mb-3">
               <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#51905c"><path d="M423.5-103.5Q400-127 400-160h160q0 33-23.5 56.5T480-80q-33 0-56.5-23.5ZM320-200v-80h320v80H320Zm10-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z"/></svg>
-              <span className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#51905c" }}>What You'll Learn</span>
+              <span className="text-base font-semibold uppercase tracking-widest" style={{ color: "#51905c" }}>What You'll Learn</span>
             </div>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
               Explore Gen Alpha Culture
             </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
               From slang to memes — everything you need to bridge the generational gap, one lesson at a time.
             </p>
           </motion.div>
@@ -150,10 +150,10 @@ const Index = () => {
                   style={{ color: "#51905c" }}
                   strokeWidth={1.5}
                 />
-                <h3 className="font-display text-lg font-bold mb-2" style={{ color: "#1a1a1a" }}>
+                <h3 className="font-display text-xl font-bold mb-2" style={{ color: "#1a1a1a" }}>
                   {feature.title}
                 </h3>
-                <p className="text-sm leading-relaxed" style={{ color: "#6b6b6b" }}>
+                <p className="text-base leading-relaxed" style={{ color: "#6b6b6b" }}>
                   {feature.description}
                 </p>
               </motion.div>
