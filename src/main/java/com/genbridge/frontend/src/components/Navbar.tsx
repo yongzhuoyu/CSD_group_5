@@ -34,7 +34,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/" className="flex items-center gap-2">
-          <span className="font-display text-xl font-bold text-foreground">
+          <span className="font-display text-2xl font-bold text-foreground">
             GenBridge
           </span>
         </Link>
@@ -70,10 +70,10 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild>
+              <Button variant="ghost" asChild className="text-base">
                 <Link to="/login">Log in</Link>
               </Button>
-              <Button asChild>
+              <Button asChild className="text-base">
                 <Link to="/register">Get Started</Link>
               </Button>
             </>
