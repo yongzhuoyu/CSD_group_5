@@ -571,7 +571,7 @@ const Learn = () => {
   // ── Quiz view ──────────────────────────────────────────────────────────────
   if (selectedLesson && !showLesson && quiz) {
     return (
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen" style={{backgroundColor:"#efebe1"}}>
         {sidebar}
         <AnimatePresence>
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
@@ -666,7 +666,7 @@ const Learn = () => {
   if (selectedLesson && showLesson) {
     const isComplete = completedLessons.has(selectedLesson.id);
     return (
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen" style={{backgroundColor:"#efebe1"}}>
         {sidebar}
         <AnimatePresence>
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
@@ -767,7 +767,7 @@ const Learn = () => {
     const Icon = selectedModule.icon;
 
     return (
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen" style={{backgroundColor:"#efebe1"}}>
         {sidebar}
         <div className={`flex-1 transition-all duration-300 ${contentML}`}>
           <div className="py-12 px-8 max-w-4xl mx-auto">
@@ -858,7 +858,7 @@ const Learn = () => {
     const nextModule = modules.find((m) => m.lessons.some((l) => l.id === nextLesson?.id));
 
     return (
-      <div className="flex h-screen bg-background overflow-hidden">
+      <div className="flex h-screen overflow-hidden" style={{backgroundColor:"#efebe1"}}>
         {sidebar}
 
         {/* Main content — the only other section */}
@@ -1019,7 +1019,7 @@ const Learn = () => {
 
   // ── Learn view (modules) ───────────────────────────────────────────────────
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen overflow-hidden" style={{backgroundColor:"#efebe1"}}>
       {sidebar}
       <div className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-8`}>
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
