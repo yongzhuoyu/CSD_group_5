@@ -32,9 +32,27 @@ const features = [
 
 const Index = () => {
   const isLoggedIn = !!localStorage.getItem("token");
+  const heroPanelBg   = "rgba(239,235,225,0.90)";
+  const bodyTextColor = "#4A4A4A";
+  const startBtnBg    = "#ffffff";
+  const startBtnColor = "#51905c";
+  const featureHover  = "#e4dfd3";
+  const featureTitleC = "#1a1a1a";
+  const featureDescC  = "#6b6b6b";
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#efebe1", "--background": "38 28% 89%", "--border": "38 15% 80%" } as React.CSSProperties}>
+    <div className="min-h-screen" style={{
+      backgroundColor: "#efebe1",
+      "--background": "44 30% 91%",
+      "--foreground": "220 40% 13%",
+      "--card": "0 0% 100%",
+      "--card-foreground": "220 40% 13%",
+      "--muted": "220 20% 95%",
+      "--muted-foreground": "220 10% 50%",
+      "--border": "220 15% 90%",
+      "--primary": "130 28% 44%",
+      "--primary-foreground": "0 0% 100%",
+    } as React.CSSProperties}>
       <Navbar />
 
       {/* Hero */}
@@ -54,7 +72,7 @@ const Index = () => {
         {/* Text panel — floats over the right portion of the image */}
         <motion.div
           className="absolute right-0 top-0 bottom-0 flex flex-col justify-center px-10 py-10"
-          style={{ width: "48%", backgroundColor: "rgba(239,235,225,0.90)", backdropFilter: "blur(6px)" }}
+          style={{ width: "48%", backgroundColor: heroPanelBg, backdropFilter: "blur(6px)" }}
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
@@ -89,22 +107,22 @@ const Index = () => {
             </span>
             <span className="block" style={{ marginLeft: "2.4rem" }}>is saying.</span>
           </h1>
-          <p className="text-lg mb-8 leading-relaxed" style={{ color: "#4A4A4A", marginLeft: "2.4rem" }}>
+          <p className="text-lg mb-8 leading-relaxed" style={{ color: bodyTextColor, marginLeft: "2.4rem" }}>
             From "rizz" to "sigma" — learn the slang, memes, and culture your kids, students, or coworkers are speaking fluently.
           </p>
           <div className="flex flex-wrap gap-3" style={{ marginLeft: "2.4rem" }}>
             <Link
               to="/register"
-              className="font-bold text-sm uppercase tracking-widest px-6 py-3 rounded-xl hover:opacity-80 transition-opacity"
-              style={{ backgroundColor: "#ffffff", color: "#51905c" }}
+              className="btn-3d font-bold text-sm uppercase tracking-widest px-6 py-3 rounded-xl hover:opacity-80 transition-opacity"
+              style={{ backgroundColor: startBtnBg, color: startBtnColor, boxShadow: "0 5px 0 #c8bfad" }}
             >
               Start Learning →
             </Link>
             {!isLoggedIn && (
               <Link
                 to="/login"
-                className="font-bold text-sm uppercase tracking-widest px-6 py-3 rounded-xl border-2 hover:opacity-80 transition-opacity"
-                style={{ borderColor: "#51905c", color: "#51905c" }}
+                className="btn-3d font-bold text-sm uppercase tracking-widest px-6 py-3 rounded-xl border-2 hover:opacity-80 transition-opacity"
+                style={{ borderColor: "#51905c", color: "#51905c", boxShadow: "0 5px 0 rgba(81,144,92,0.4)" }}
               >
                 I have an account
               </Link>
@@ -143,17 +161,20 @@ const Index = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className="group p-7 flex flex-col rounded-2xl transition-colors duration-200 hover:bg-[#e4dfd3] cursor-default"
+                className="group p-7 flex flex-col rounded-2xl transition-colors duration-200 cursor-default"
+                style={{ ["--hover-bg" as string]: featureHover }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = featureHover)}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = "")}
               >
                 <feature.icon
                   className="w-8 h-8 mb-5"
                   style={{ color: "#51905c" }}
                   strokeWidth={1.5}
                 />
-                <h3 className="font-display text-xl font-bold mb-2" style={{ color: "#1a1a1a" }}>
+                <h3 className="font-display text-xl font-bold mb-2" style={{ color: featureTitleC }}>
                   {feature.title}
                 </h3>
-                <p className="text-base leading-relaxed" style={{ color: "#6b6b6b" }}>
+                <p className="text-base leading-relaxed" style={{ color: featureDescC }}>
                   {feature.description}
                 </p>
               </motion.div>
@@ -178,7 +199,7 @@ const Index = () => {
               <p className="text-primary-foreground/70 mb-8 max-w-md mx-auto">
                 Join thousands of curious learners bridging the generational gap. It's free to start.
               </p>
-              <Button size="lg" variant="secondary" asChild>
+              <Button size="lg" variant="secondary" asChild className="btn-3d" style={{ boxShadow: "0 5px 0 rgba(0,0,0,0.15)" }}>
                 <Link to="/register">
                   Create Free Account
                   <ArrowRight className="w-4 h-4 ml-2" />

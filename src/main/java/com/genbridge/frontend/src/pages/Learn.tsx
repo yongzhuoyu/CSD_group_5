@@ -28,6 +28,8 @@ import AccountIcon from "@/assets/icons/account.svg?react";
 import NoteStackIcon from "@/assets/icons/note_stack.svg?react";
 import BarChartIcon from "@/assets/icons/bar_chart.svg?react";
 import KeepIcon from "@/assets/icons/keep.svg?react";
+import SettingsIcon from "@/assets/icons/settings.svg?react";
+import BridgeIcon from "@/assets/icons/bridge.svg?react";
 import { useUserProgress } from "@/hooks/useUserProgress";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -488,7 +490,7 @@ const Learn = () => {
       {sidebarExpanded ? (
         <div className="flex items-center h-16 px-4 border-b border-border shrink-0 gap-3">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5 text-primary-foreground" />
+            <BridgeIcon className="w-5 h-5 text-primary-foreground" />
           </div>
           <span className="font-sidebar text-xl font-bold text-foreground whitespace-nowrap flex-1">GenBridge</span>
           <button
@@ -536,6 +538,13 @@ const Learn = () => {
           <AccountIcon className="w-6 h-6 shrink-0" />
           {sidebarExpanded && <span className="whitespace-nowrap">Profile</span>}
         </Link>
+        <Link
+          to="/settings"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
+        >
+          <SettingsIcon className="w-6 h-6 shrink-0" />
+          {sidebarExpanded && <span className="whitespace-nowrap">Settings</span>}
+        </Link>
       </nav>
 
       {/* Bottom: streak / XP / logout */}
@@ -571,7 +580,7 @@ const Learn = () => {
   // ── Quiz view ──────────────────────────────────────────────────────────────
   if (selectedLesson && !showLesson && quiz) {
     return (
-      <div className="flex min-h-screen" style={{backgroundColor:"#efebe1"}}>
+      <div className="flex min-h-screen bg-background">
         {sidebar}
         <AnimatePresence>
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
@@ -666,7 +675,7 @@ const Learn = () => {
   if (selectedLesson && showLesson) {
     const isComplete = completedLessons.has(selectedLesson.id);
     return (
-      <div className="flex min-h-screen" style={{backgroundColor:"#efebe1"}}>
+      <div className="flex min-h-screen bg-background">
         {sidebar}
         <AnimatePresence>
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
@@ -767,7 +776,7 @@ const Learn = () => {
     const Icon = selectedModule.icon;
 
     return (
-      <div className="flex min-h-screen" style={{backgroundColor:"#efebe1"}}>
+      <div className="flex min-h-screen bg-background">
         {sidebar}
         <div className={`flex-1 transition-all duration-300 ${contentML}`}>
           <div className="py-12 px-8 max-w-4xl mx-auto">
@@ -858,7 +867,7 @@ const Learn = () => {
     const nextModule = modules.find((m) => m.lessons.some((l) => l.id === nextLesson?.id));
 
     return (
-      <div className="flex h-screen overflow-hidden" style={{backgroundColor:"#efebe1"}}>
+      <div className="flex h-screen overflow-hidden bg-background">
         {sidebar}
 
         {/* Main content — the only other section */}
@@ -873,7 +882,7 @@ const Learn = () => {
               </div>
               <button
                 onClick={() => setCurrentPage("learn")}
-                className="flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl text-lg font-semibold hover:bg-primary/90 transition-colors"
+                className="btn-3d flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl text-lg font-semibold hover:bg-primary/90 transition-colors"
               >
                 Continue learning <ChevronRight className="w-5 h-5" />
               </button>
@@ -1019,7 +1028,7 @@ const Learn = () => {
 
   // ── Learn view (modules) ───────────────────────────────────────────────────
   return (
-    <div className="flex h-screen overflow-hidden" style={{backgroundColor:"#efebe1"}}>
+    <div className="flex h-screen overflow-hidden bg-background">
       {sidebar}
       <div className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-8`}>
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>

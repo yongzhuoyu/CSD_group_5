@@ -1,5 +1,7 @@
+import React from "react";
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import BridgeIcon from "@/assets/icons/bridge.svg?react";
+import heroImg from "@/assets/hero.png";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -8,44 +10,73 @@ interface AuthLayoutProps {
 }
 
 const AuthLayout = ({ children, title, subtitle }: AuthLayoutProps) => {
+  const lightVars = {
+    "--background": "44 30% 91%",
+    "--foreground": "220 40% 13%",
+    "--card": "0 0% 100%",
+    "--card-foreground": "220 40% 13%",
+    "--muted": "220 20% 95%",
+    "--muted-foreground": "220 10% 50%",
+    "--border": "220 15% 90%",
+    "--input": "220 15% 90%",
+    "--primary": "130 28% 44%",
+    "--primary-foreground": "0 0% 100%",
+  } as React.CSSProperties;
+
   return (
-    <div className="min-h-screen flex">
-      {/* Left panel - decorative */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden items-center justify-center">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-40 h-40 rounded-full bg-accent animate-float" />
-          <div className="absolute bottom-32 right-16 w-24 h-24 rounded-full bg-lime animate-float" style={{ animationDelay: "1s" }} />
-          <div className="absolute top-1/2 left-1/3 w-32 h-32 rounded-full bg-lavender animate-float" style={{ animationDelay: "2s" }} />
-        </div>
-        <div className="relative z-10 text-center px-12">
-          <div className="w-16 h-16 rounded-2xl bg-primary-foreground/20 flex items-center justify-center mx-auto mb-6">
-            <Sparkles className="w-9 h-9 text-primary-foreground" />
+    <div className="min-h-screen flex bg-background" style={lightVars}>
+
+      {/* Left panel — form */}
+      <div className="flex flex-col justify-between w-full lg:w-[45%] px-10 py-10 shrink-0">
+
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2 w-fit">
+          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-sm">
+            <BridgeIcon className="w-5 h-5 text-primary-foreground" />
           </div>
-          <h2 className="font-display text-4xl font-bold text-primary-foreground mb-4">
-            Decode the culture.
-          </h2>
-          <p className="text-primary-foreground/70 text-lg max-w-sm mx-auto">
-            Learn the language, trends, and references that define Gen Alpha — one lesson at a time.
-          </p>
-        </div>
-      </div>
+          <span className="font-display text-xl font-bold text-foreground">GenBridge</span>
+        </Link>
 
-      {/* Right panel - form */}
-      <div className="flex-1 flex items-center justify-center p-6 bg-background">
-        <div className="w-full max-w-md">
-          <Link to="/" className="flex items-center gap-2 mb-10 lg:hidden">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-display text-xl font-bold text-foreground">GenBridge</span>
-          </Link>
-
-          <h1 className="font-display text-3xl font-bold text-foreground mb-2">{title}</h1>
-          <p className="text-muted-foreground mb-8">{subtitle}</p>
-
+        {/* Form content — vertically centred */}
+        <div className="w-full max-w-sm mx-auto">
+          <h1 className="font-display text-3xl font-bold text-foreground mb-1">{title}</h1>
+          <p className="text-muted-foreground text-sm mb-8">{subtitle}</p>
           {children}
         </div>
+
+        {/* Footer */}
+        <p className="text-xs text-muted-foreground/50 text-center">
+          © {new Date().getFullYear()} GenBridge. All rights reserved.
+        </p>
       </div>
+
+      {/* Right panel — illustration */}
+      <div className="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center bg-primary/5 border-l border-border">
+        {/* Decorative blobs */}
+        <div className="absolute top-[-80px] right-[-80px] w-96 h-96 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute bottom-[-60px] left-[-40px] w-72 h-72 rounded-full bg-primary/10 blur-2xl" />
+
+        <div className="relative z-10 flex flex-col items-center text-center px-16">
+          {/* Headline */}
+          <h2 className="font-display text-4xl font-bold text-foreground mb-3 leading-tight">
+            Bridge the gap with<br />
+            <span className="text-primary">Gen Alpha.</span>
+          </h2>
+          <p className="text-muted-foreground text-base max-w-xs mb-10 leading-relaxed">
+            Learn the slang, memes, and culture that define the next generation — one lesson at a time.
+          </p>
+
+          {/* Hero image / illustration placeholder */}
+          <div className="w-full max-w-md rounded-3xl overflow-hidden shadow-xl border border-border">
+            <img
+              src={heroImg}
+              alt="GenBridge illustration"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 };

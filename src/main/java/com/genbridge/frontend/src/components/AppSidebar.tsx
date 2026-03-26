@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Sparkles, Flame, Star, LogOut } from "lucide-react";
+import { Flame, Star, LogOut } from "lucide-react";
+import BridgeIcon from "@/assets/icons/bridge.svg?react";
 import HomeIcon from "@/assets/icons/home.svg?react";
 import DictionaryIcon from "@/assets/icons/dictionary.svg?react";
 import AccountIcon from "@/assets/icons/account.svg?react";
 import KeepIcon from "@/assets/icons/keep.svg?react";
+import SettingsIcon from "@/assets/icons/settings.svg?react";
 import { useUserProgress } from "@/hooks/useUserProgress";
 
 interface AppSidebarProps {
-  activePage: "home" | "learn" | "profile";
+  activePage: "home" | "learn" | "profile" | "settings";
 }
 
 const AppSidebar = ({ activePage }: AppSidebarProps) => {
@@ -26,9 +28,10 @@ const AppSidebar = ({ activePage }: AppSidebarProps) => {
   const sidebarW = expanded ? "w-72" : "w-16";
 
   const navItems = [
-    { icon: HomeIcon,       label: "Home",    href: "/learn",   page: "home"    },
-    { icon: DictionaryIcon, label: "Learn",   href: "/learn",   page: "learn"   },
-    { icon: AccountIcon,    label: "Profile", href: "/profile", page: "profile" },
+    { icon: HomeIcon,       label: "Home",     href: "/learn",    page: "home"     },
+    { icon: DictionaryIcon, label: "Learn",    href: "/learn",    page: "learn"    },
+    { icon: AccountIcon,    label: "Profile",  href: "/profile",  page: "profile"  },
+    { icon: SettingsIcon,   label: "Settings", href: "/settings", page: "settings" },
   ] as const;
 
   return (
@@ -38,7 +41,7 @@ const AppSidebar = ({ activePage }: AppSidebarProps) => {
       {expanded ? (
         <div className="flex items-center h-16 px-4 border-b border-border shrink-0 gap-3">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5 text-primary-foreground" />
+            <BridgeIcon className="w-5 h-5 text-primary-foreground" />
           </div>
           <span className="font-sidebar text-xl font-bold text-foreground whitespace-nowrap flex-1">GenBridge</span>
           <button

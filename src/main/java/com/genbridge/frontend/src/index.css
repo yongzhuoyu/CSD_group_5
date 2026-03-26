@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --background: 40 33% 98%;
+    --background: 44 30% 91%;
     --foreground: 220 40% 13%;
 
     --card: 0 0% 100%;
@@ -105,4 +105,14 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
   }
+}
+
+/* 3-D push button */
+.btn-3d {
+  box-shadow: 0 5px 0 #3a6b42;
+  transition: box-shadow 80ms, transform 80ms;
+}
+.btn-3d:active {
+  box-shadow: 0 2px 0 #3a6b42;
+  transform: translateY(3px);
 }

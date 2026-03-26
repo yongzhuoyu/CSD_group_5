@@ -96,7 +96,7 @@ const Profile = () => {
   const nextLevel = isMax ? null : LEVELS[LEVELS.findIndex((l) => l.label === current.label) + 1];
 
   return (
-    <div className="flex min-h-screen" style={{ backgroundColor: "#efebe1" }}>
+    <div className="flex min-h-screen bg-background">
       <AppSidebar activePage="profile" />
 
       <div className="flex-1 ml-72 pt-12 pb-16 px-8">

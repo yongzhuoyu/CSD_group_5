@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LogOut, Flame, Star } from "lucide-react";
+import BridgeIcon from "@/assets/icons/bridge.svg?react";
 import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
@@ -31,10 +32,16 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+    <nav
+      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg border-b"
+      style={{ backgroundColor: "rgba(239,235,225,0.85)", borderColor: "rgba(0,0,0,0.08)" }}
+    >
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/" className="flex items-center gap-2">
-          <span className="font-display text-2xl font-bold text-foreground">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+            <BridgeIcon className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <span className="font-display text-2xl font-bold" style={{ color: "#1a2e1a" }}>
             GenBridge
           </span>
         </Link>
@@ -70,10 +77,10 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild className="text-base">
+              <Button variant="ghost" asChild className="btn-3d text-base" style={{ color: "#1a2e1a", boxShadow: "0 4px 0 rgba(81,144,92,0.35)" }}>
                 <Link to="/login">Log in</Link>
               </Button>
-              <Button asChild className="text-base">
+              <Button asChild className="btn-3d text-base">
                 <Link to="/register">Get Started</Link>
               </Button>
             </>
