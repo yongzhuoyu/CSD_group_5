@@ -37,23 +37,23 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/content/*").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/content/*").hasRole("ADMIN")
 
-                // Public lesson endpoints — learner access, no token needed
+                // Public lesson endpoints — no token needed
                 .requestMatchers(HttpMethod.GET, "/api/lessons").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/lessons/*").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/lessons/{id}").permitAll()
 
-                // Learner quiz and progress access
-                .requestMatchers(HttpMethod.GET, "/api/lessons/*/quiz").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/lessons/*/quiz/submit").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/lessons/*/start").authenticated()
+                // Learner: authenticated access to nested lesson endpoints
+                .requestMatchers(HttpMethod.GET, "/api/lessons/{id}/quiz").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/start").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/quiz/submit").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/content/lesson/{lessonId}").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/progress").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/content/lesson/*").authenticated()
 
                 // Admin-only lesson management
-                .requestMatchers("/api/admin/lessons").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/lessons").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/lessons/*").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/lessons/*").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/lessons/*/quiz").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/lessons/{id}").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/lessons/{id}").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/quiz").hasRole("ADMIN")
 
                 // All other endpoints require any authenticated user
                 .anyRequest().authenticated()

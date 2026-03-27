@@ -109,7 +109,7 @@ public class QuizService {
         attempt.setCorrectAnswers(correctAnswers);
         quizAttemptRepository.save(attempt);
 
-        updateLessonProgressStatus(user.getId(), lessonId);
+        updateLessonProgressStatus(user.getId(), lessonId, allAnswersCorrect);
         userService.updateStreak(user);
 
         Map<String, Object> result = new HashMap<>();
@@ -145,7 +145,9 @@ public class QuizService {
         quizAttemptRepository.save(attempt);
 
         userService.updateStreak(user);
-        boolean completed = updateLessonProgressStatus(user.getId(), lessonId);
+        long totalQuestions = quizQuestionRepository.countByLessonId(lessonId);
+        long correctAnswered = quizAttemptRepository.countDistinctCorrectQuestionAttempts(user.getId(), lessonId);
+        boolean completed = updateLessonProgressStatus(user.getId(), lessonId, totalQuestions > 0 && correctAnswered >= totalQuestions);
 
         Map<String, Object> response = new HashMap<>();
         response.put("lessonId", lessonId);
@@ -159,7 +161,7 @@ public class QuizService {
         return response;
     }
 
-    private boolean updateLessonProgressStatus(java.util.UUID userId, Long lessonId) {
+    private boolean updateLessonProgressStatus(java.util.UUID userId, Long lessonId, boolean completed) {
         LessonProgress progress = lessonProgressRepository.findByUserIdAndLessonId(userId, lessonId)
                 .orElseGet(() -> {
                     LessonProgress newProgress = new LessonProgress();
@@ -168,10 +170,6 @@ public class QuizService {
                     return newProgress;
                 });
 
-        long totalQuestions = quizQuestionRepository.countByLessonId(lessonId);
-        long correctAnsweredQuestions = quizAttemptRepository.countDistinctCorrectQuestionAttempts(userId, lessonId);
-
-        boolean completed = totalQuestions > 0 && correctAnsweredQuestions >= totalQuestions;
         progress.setCompleted(completed);
         progress.setCompletedAt(completed ? LocalDateTime.now() : null);
         lessonProgressRepository.save(progress);
