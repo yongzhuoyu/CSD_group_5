@@ -41,6 +41,13 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/lessons").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/lessons/*").permitAll()
 
+                // Learner quiz and progress access
+                .requestMatchers(HttpMethod.GET, "/api/lessons/*/quiz").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/lessons/*/quiz/submit").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/lessons/*/start").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/progress").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/content/lesson/*").authenticated()
+
                 // Admin-only lesson management
                 .requestMatchers("/api/admin/lessons").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/lessons").hasRole("ADMIN")
