@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import AppSidebar from "@/components/AppSidebar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import api from "@/services/api";
 import {
@@ -13,6 +15,7 @@ import {
   CheckCircle2,
   ArrowLeft,
   Loader2,
+  Flag,
 } from "lucide-react";
 
 interface Lesson {
@@ -73,6 +76,11 @@ const LessonDetail = () => {
     completed: boolean;
   } | null>(null);
   const [submittingQuiz, setSubmittingQuiz] = useState(false);
+
+  // report state
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportText, setReportText] = useState("");
+  const [submittingReport, setSubmittingReport] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -136,6 +144,21 @@ const LessonDetail = () => {
       toast({ title: "Error submitting quiz" });
     } finally {
       setSubmittingQuiz(false);
+    }
+  };
+
+  const submitReport = async () => {
+    if (!lesson || !reportText.trim()) return;
+    setSubmittingReport(true);
+    try {
+      await api.post(`/lessons/${lesson.id}/report`, { description: reportText });
+      toast({ title: "Report submitted", description: "Thank you — an admin will review it." });
+      setReportOpen(false);
+      setReportText("");
+    } catch {
+      toast({ title: "Error submitting report" });
+    } finally {
+      setSubmittingReport(false);
     }
   };
 
@@ -349,9 +372,45 @@ const LessonDetail = () => {
                 No quiz available yet — check back later.
               </p>
             )}
+
+            {/* Report error */}
+            <div className="mt-12 pt-6 border-t border-border">
+              <button
+                onClick={() => setReportOpen(true)}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Flag className="w-4 h-4" />
+                Report a factual error
+              </button>
+            </div>
           </motion.div>
         </div>
       </div>
+
+      {/* Report modal */}
+      <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Report a Factual Error</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground mb-3">
+            Describe the error you found. An admin will review and fix it.
+          </p>
+          <Textarea
+            placeholder="e.g. The definition of 'rizz' is incorrect — it refers to..."
+            value={reportText}
+            onChange={(e) => setReportText(e.target.value)}
+            rows={4}
+          />
+          <Button
+            className="w-full mt-3"
+            disabled={!reportText.trim() || submittingReport}
+            onClick={submitReport}
+          >
+            {submittingReport ? "Submitting..." : "Submit Report"}
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

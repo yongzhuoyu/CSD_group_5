@@ -30,11 +30,12 @@ const PrivateRoute = ({ element }: { element: JSX.Element }) => {
     );
 };
 
-// Redirects to /learn if already logged in
+// Redirects to /admin or /lessons if already logged in
 const PublicOnlyRoute = ({ element }: { element: JSX.Element }) => {
-  return localStorage.getItem("token") ?
-      <Navigate to="/lessons" replace />
-    : element;
+  if (!localStorage.getItem("token")) return element;
+  return localStorage.getItem("role") === "ADMIN"
+    ? <Navigate to="/admin" replace />
+    : <Navigate to="/lessons" replace />;
 };
 
 // Intercepts 401 responses anywhere in the app and logs the user out
