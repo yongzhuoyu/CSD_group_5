@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, BookOpen, Zap, Users, ArrowRight } from "lucide-react";
+import { MessageCircle, BookOpen, Zap, TrendingUp, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import FeatureCard from "@/components/FeatureCard";
 
@@ -26,9 +26,9 @@ const features = [
     color: "lavender" as const,
   },
   {
-    icon: Users,
-    title: "Community Insights",
-    description: "Learn alongside others and see how different generations interpret the same cultural moments.",
+    icon: TrendingUp,
+    title: "Track Your Progress",
+    description: "See how far you've come — track completed lessons, maintain your daily streak, and keep improving.",
     color: "lime" as const,
   },
 ];
@@ -58,7 +58,7 @@ const Index = () => {
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Button size="lg" className={isLoggedIn ? "text-lg px-10 py-6 h-auto" : ""} asChild>
-                  <Link to="/register">
+                  <Link to={isLoggedIn ? "/learn" : "/register"}>
                     {isLoggedIn ? "Start Learning" : "Start Learning Free"}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
