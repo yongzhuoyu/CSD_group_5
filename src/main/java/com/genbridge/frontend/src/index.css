@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --background: 40 33% 98%;
+    --background: 44 30% 91%;
     --foreground: 220 40% 13%;
 
     --card: 0 0% 100%;
@@ -15,7 +15,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 40% 13%;
 
-    --primary: 174 72% 44%;
+    --primary: 130 28% 44%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 25% 93%;
@@ -32,7 +32,7 @@
 
     --border: 220 15% 90%;
     --input: 220 15% 90%;
-    --ring: 174 72% 44%;
+    --ring: 130 28% 44%;
 
     --radius: 0.75rem;
 
@@ -63,7 +63,7 @@
     --popover: 220 30% 12%;
     --popover-foreground: 40 20% 95%;
 
-    --primary: 174 72% 44%;
+    --primary: 130 28% 44%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 25% 18%;
@@ -80,16 +80,16 @@
 
     --border: 220 20% 20%;
     --input: 220 20% 20%;
-    --ring: 174 72% 44%;
+    --ring: 130 28% 44%;
 
     --sidebar-background: 220 30% 10%;
     --sidebar-foreground: 40 20% 95%;
-    --sidebar-primary: 174 72% 44%;
+    --sidebar-primary: 130 28% 44%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 220 25% 15%;
     --sidebar-accent-foreground: 40 20% 95%;
     --sidebar-border: 220 20% 18%;
-    --sidebar-ring: 174 72% 44%;
+    --sidebar-ring: 130 28% 44%;
   }
 }
 
@@ -105,4 +105,14 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
   }
+}
+
+/* 3-D push button */
+.btn-3d {
+  box-shadow: 0 5px 0 #3a6b42;
+  transition: box-shadow 80ms, transform 80ms;
+}
+.btn-3d:active {
+  box-shadow: 0 2px 0 #3a6b42;
+  transform: translateY(3px);
 }

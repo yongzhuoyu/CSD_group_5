@@ -15,7 +15,10 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Learn from "./pages/Learn";
 import Admin from "./pages/Admin";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import { ThemeProvider } from "./context/ThemeContext";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +58,7 @@ const TokenExpiryHandler = () => {
 };
 
 const App = () => (
+  <ThemeProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -86,11 +90,14 @@ const App = () => (
             }
           />
 
+          <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
+          <Route path="/settings" element={<PrivateRoute element={<Settings />} />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;

@@ -41,9 +41,9 @@ const Register = () => {
 
   return (
     <AuthLayout title="Create your account" subtitle="Start your Gen Alpha learning journey today.">
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="name">Full name</Label>
+          <Label htmlFor="name" className="text-sm font-semibold text-foreground">Full name</Label>
           <Input
             id="name"
             type="text"
@@ -51,11 +51,12 @@ const Register = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            className="h-13 px-4 py-3.5 text-base rounded-xl border-2 border-border bg-white shadow-sm focus-visible:ring-primary/30"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" className="text-sm font-semibold text-foreground">Email</Label>
           <Input
             id="email"
             type="email"
@@ -63,11 +64,12 @@ const Register = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            className="h-13 px-4 py-3.5 text-base rounded-xl border-2 border-border bg-white shadow-sm focus-visible:ring-primary/30"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password" className="text-sm font-semibold text-foreground">Password</Label>
           <div className="relative">
             <Input
               id="password"
@@ -77,6 +79,7 @@ const Register = () => {
               onChange={(e) => setPassword(e.target.value)}
               minLength={8}
               required
+              className="h-13 px-4 py-3.5 text-base rounded-xl border-2 border-border bg-white shadow-sm focus-visible:ring-primary/30"
             />
             <button
               type="button"
@@ -88,7 +91,13 @@ const Register = () => {
           </div>
         </div>
 
-        <Button type="submit" className="w-full" size="lg" disabled={loading}>
+        <Button
+          type="submit"
+          size="lg"
+          disabled={loading}
+          className="btn-3d w-full text-base rounded-xl font-semibold"
+          style={{ height: "3.25rem", fontSize: "1.05rem" }}
+        >
           {loading ? "Creating account..." : "Create account"}
         </Button>
 
