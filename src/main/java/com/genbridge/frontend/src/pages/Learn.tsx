@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import Navbar from "@/components/Navbar";
+import AppSidebar from "@/components/AppSidebar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
@@ -39,6 +39,7 @@ const badgeColorMap: Record<string, string> = {
 
 const Learn = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
 
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -67,17 +68,17 @@ const Learn = () => {
       }
     };
     fetchAll();
-  }, []);
+  }, [location]);
 
   const completedCount = Object.values(progressMap).filter(Boolean).length;
   const totalCount = lessons.length;
   const overallProgress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <div className="pt-24 pb-16 px-4">
-        <div className="container mx-auto max-w-5xl">
+    <div className="flex min-h-screen bg-background">
+      <AppSidebar activePage="learn" />
+      <div className="flex-1 ml-72 pt-12 pb-16 px-8">
+        <div className="max-w-4xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="font-display text-4xl font-bold text-foreground mb-2">Lessons</h1>
             <p className="text-muted-foreground mb-6">
