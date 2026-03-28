@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   BookOpen,
   MessageCircle,
@@ -491,11 +492,13 @@ const Learn = () => {
     ? 100
     : Math.min(((xp - currentLevel.min) / (currentLevel.max - currentLevel.min)) * 100, 100);
   const xpToNext = isMaxLevel ? null : currentLevel.max - xp;
-  const termsLearned = modules
+  const learnedTermsList = modules
     .flatMap((m) => m.lessons)
     .filter((l) => completedLessons.has(l.id))
-    .reduce((sum, l) => sum + l.content.keyTerms.length, 0);
+    .flatMap((l) => l.content.keyTerms);
+  const termsLearned = learnedTermsList.length;
   const totalTerms = modules.flatMap((m) => m.lessons).reduce((sum, l) => sum + l.content.keyTerms.length, 0);
+  const [learnedWordsOpen, setLearnedWordsOpen] = useState(false);
   const completedModulesCount = modules.filter((m) => m.lessons.every((l) => completedLessons.has(l.id))).length;
 
   const handleLessonClick = (lesson: Lesson) => {
@@ -1010,11 +1013,14 @@ const Learn = () => {
                     <span className="font-display text-xl font-semibold text-card-foreground">My Words</span>
                   </div>
                   <div className="grid grid-cols-3 gap-3 text-center">
-                    <div className="rounded-xl bg-primary/5 p-3">
+                    <button
+                      onClick={() => termsLearned > 0 && setLearnedWordsOpen(true)}
+                      className={`rounded-xl bg-primary/5 p-3 text-center w-full transition-colors ${termsLearned > 0 ? "hover:bg-primary/10 cursor-pointer" : "cursor-default"}`}
+                    >
                       <Star className="w-5 h-5 text-primary mx-auto mb-1" />
                       <p className="font-bold text-2xl text-foreground leading-none">{termsLearned}</p>
                       <p className="text-xs text-muted-foreground mt-1">Learned</p>
-                    </div>
+                    </button>
                     <div className="rounded-xl bg-muted/40 p-3">
                       <BookOpen className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
                       <p className="font-bold text-2xl text-foreground leading-none">{totalTerms - termsLearned}</p>
@@ -1084,6 +1090,26 @@ const Learn = () => {
 
           </motion.div>
         </main>
+
+        {/* Learned Words Dialog */}
+        <Dialog open={learnedWordsOpen} onOpenChange={setLearnedWordsOpen}>
+          <DialogContent className="max-w-md max-h-[70vh] flex flex-col">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Star className="w-5 h-5 text-primary" />
+                Learned Words ({termsLearned})
+              </DialogTitle>
+            </DialogHeader>
+            <div className="overflow-y-auto flex-1 space-y-2 pr-1">
+              {learnedTermsList.map((t, i) => (
+                <div key={i} className="rounded-xl border border-border bg-muted/30 px-4 py-3">
+                  <p className="font-semibold text-sm text-foreground">{t.term}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t.definition}</p>
+                </div>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
