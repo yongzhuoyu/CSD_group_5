@@ -38,6 +38,14 @@ const PublicOnlyRoute = ({ element }: { element: JSX.Element }) => {
     : <Navigate to="/lessons" replace />;
 };
 
+// Home: dashboard for logged-in users, landing page otherwise
+const HomeRoute = () => {
+  if (!localStorage.getItem("token")) return <Index />;
+  return localStorage.getItem("role") === "ADMIN"
+    ? <Navigate to="/admin" replace />
+    : <Navigate to="/lessons" replace />;
+};
+
 // Intercepts 401 responses anywhere in the app and logs the user out
 const TokenExpiryHandler = () => {
   const navigate = useNavigate();
@@ -68,7 +76,7 @@ const App = () => (
       <BrowserRouter>
         <TokenExpiryHandler />
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<HomeRoute />} />
           <Route
             path="/login"
             element={<PublicOnlyRoute element={<Login />} />}
