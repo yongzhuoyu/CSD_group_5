@@ -4,6 +4,7 @@ import com.genbridge.backend.entity.Lesson;
 import com.genbridge.backend.entity.LessonProgress;
 import com.genbridge.backend.repository.LessonProgressRepository;
 import com.genbridge.backend.repository.LessonRepository;
+import com.genbridge.backend.repository.QuestCompletionRepository;
 import com.genbridge.backend.user.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,11 +23,14 @@ public class ProfileController {
 
     private final LessonProgressRepository lessonProgressRepository;
     private final LessonRepository lessonRepository;
+    private final QuestCompletionRepository questCompletionRepository;
 
     public ProfileController(LessonProgressRepository lessonProgressRepository,
-                             LessonRepository lessonRepository) {
+                             LessonRepository lessonRepository,
+                             QuestCompletionRepository questCompletionRepository) {
         this.lessonProgressRepository = lessonProgressRepository;
         this.lessonRepository = lessonRepository;
+        this.questCompletionRepository = questCompletionRepository;
     }
 
     @GetMapping("/profile")
@@ -52,7 +56,20 @@ public class ProfileController {
                 })
                 .collect(Collectors.toList());
 
-        int xp = completedLessons.size() * 10;
+        List<Map<String, Object>> completedQuests = questCompletionRepository
+                .findByUserOrderByCompletedAtDesc(user)
+                .stream()
+                .map(qc -> {
+                    Map<String, Object> entry = new HashMap<>();
+                    entry.put("questId", qc.getQuest().getId());
+                    entry.put("questTitle", qc.getQuest().getTitle());
+                    entry.put("reflection", qc.getReflection());
+                    entry.put("completedAt", qc.getCompletedAt());
+                    return entry;
+                })
+                .collect(Collectors.toList());
+
+        int xp = completedLessons.size() * 10 + completedQuests.size() * 15;
 
         Map<String, Object> profile = new HashMap<>();
         profile.put("id", user.getId());
@@ -63,9 +80,9 @@ public class ProfileController {
         profile.put("lastActiveDate", user.getLastActiveDate());
         profile.put("completedLessonsCount", completedLessons.size());
         profile.put("completedLessons", completedLessons);
+        profile.put("completedQuestsCount", completedQuests.size());
+        profile.put("completedQuests", completedQuests);
         profile.put("xp", xp);
-        profile.put("completedQuestsCount", 0);
-        profile.put("completedQuests", List.of());
 
         return ResponseEntity.ok(profile);
     }
