@@ -48,7 +48,6 @@ interface Lesson {
 interface ContentTerm {
   id: number;
   term: string;
-  title: string;
   description: string;
   example: string;
 }
@@ -201,14 +200,19 @@ const Learn = () => {
     const fetchAll = async () => {
       setLoadingLessons(true);
       try {
-        const [lessonsRes, progressRes] = await Promise.all([
+        const [lessonsRes, progressRes, profileRes] = await Promise.all([
           api.get("/lessons"),
           api.get("/progress"),
+          api.get("/profile"),
         ]);
         setLessons(lessonsRes.data);
         const map: Record<number, boolean> = {};
         (progressRes.data.lessons as ProgressEntry[]).forEach((p) => {
           map[p.lessonId] = p.completed;
+        });
+        // Also mark lessons from profile completedLessons as completed
+        (profileRes.data.completedLessons ?? []).forEach((l: { lessonId: number }) => {
+          map[l.lessonId] = true;
         });
         setProgressMap(map);
       } catch {
@@ -270,7 +274,7 @@ const Learn = () => {
   };
 
   // ── Derived stats ──────────────────────────────────────────────────────────
-  const completedCount = Object.values(progressMap).filter(Boolean).length;
+  const completedCount = lessons.filter(l => progressMap[l.id] === true).length;
   const totalCount = lessons.length;
   const overallProgress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
@@ -587,10 +591,9 @@ const Learn = () => {
                         transition={{ delay: i * 0.07 }}
                         className="rounded-2xl border border-border bg-card p-6"
                       >
-                        <h2 className="font-display text-xl font-semibold text-foreground mb-1">
-                          {term.title || term.term}
+                        <h2 className="font-display text-xl font-semibold text-foreground mb-3">
+                          {term.term}
                         </h2>
-                        <p className="text-sm font-bold text-primary mb-3">{term.term}</p>
                         <p className="text-foreground/80 leading-relaxed mb-3">{term.description}</p>
                         {term.example && (
                           <p className="text-sm text-muted-foreground pl-4 border-l-2 border-coral/30 italic">
@@ -642,6 +645,7 @@ const Learn = () => {
   // ── Home view ──────────────────────────────────────────────────────────────
   if (currentPage === "home") {
     const nextLesson = lessons.find((l) => !progressMap[l.id]);
+    const spotlightLesson = nextLesson ?? lessons[Math.floor(Math.random() * lessons.length)];
     return (
       <div className="flex h-screen overflow-hidden bg-background">
         {sidebar}
@@ -738,9 +742,9 @@ const Learn = () => {
                     <div className="rounded-xl bg-muted/40 p-3">
                       <BookOpen className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
                       <p className="font-bold text-2xl text-foreground leading-none">
-                        {totalCount - completedCount}
+                        {completedCount}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">Left</p>
+                      <p className="text-xs text-muted-foreground mt-1">Lessons done</p>
                     </div>
                     <div className="rounded-xl bg-muted/40 p-3">
                       <CheckCircle2 className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
@@ -767,8 +771,8 @@ const Learn = () => {
               </div>
             </div>
 
-            {/* Slang of the Day — pulled from first uncompleted lesson's first content term */}
-            {lessons.length > 0 && (
+            {/* Did You Know — only shown when all lessons are completed */}
+            {lessons.length > 0 && !nextLesson && (
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -780,10 +784,10 @@ const Learn = () => {
                   <span className="text-base font-bold uppercase tracking-widest">Did you know?</span>
                 </div>
                 <p className="font-display text-3xl font-bold text-foreground mb-2">
-                  {lessons[0].title}
+                  {spotlightLesson?.title}
                 </p>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  {lessons[0].description}
+                  {spotlightLesson?.description}
                 </p>
               </motion.div>
             )}
@@ -791,7 +795,7 @@ const Learn = () => {
             {/* Up Next */}
             {nextLesson && (
               <button
-                onClick={() => handleLessonClick(nextLesson)}
+                onClick={() => navigate(`/lessons/${nextLesson.id}`)}
                 className="w-full rounded-2xl border border-border bg-card p-5 flex items-center justify-between hover:shadow-md transition-shadow group"
               >
                 <div className="flex items-center gap-4">
@@ -912,7 +916,7 @@ const Learn = () => {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.06 }}
-                    onClick={() => handleLessonClick(lesson)}
+                    onClick={() => navigate(`/lessons/${lesson.id}`)}
                     className="w-full text-left rounded-2xl border border-border bg-card p-6 hover:shadow-lg transition-shadow group"
                   >
                     <div className="flex items-start gap-4">
@@ -940,6 +944,11 @@ const Learn = () => {
                           </span>
                         </div>
                         <p className="text-sm text-muted-foreground line-clamp-2">{lesson.description}</p>
+                        {lesson.objective && (
+                          <p className="text-xs text-primary/80 mt-1.5 line-clamp-1">
+                            <span className="font-medium">Objective:</span> {lesson.objective}
+                          </p>
+                        )}
                       </div>
                       <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0 mt-1" />
                     </div>
