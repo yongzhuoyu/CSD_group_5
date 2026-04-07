@@ -30,7 +30,6 @@ interface Lesson {
 interface ContentTerm {
   id: number;
   lessonId: number;
-  title: string;
   term: string;
   description: string;
   example: string;
@@ -328,9 +327,6 @@ const LessonDetail = () => {
                   >
                     <div className="flex items-center gap-2 mb-3">
                       <span className="font-display text-lg font-bold text-primary">{term.term}</span>
-                      {term.title !== term.term && (
-                        <span className="text-sm text-muted-foreground">({term.title})</span>
-                      )}
                     </div>
                     <p className="text-foreground/80 leading-relaxed mb-3">{term.description}</p>
                     {term.example && (
