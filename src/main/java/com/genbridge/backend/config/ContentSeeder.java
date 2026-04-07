@@ -33,16 +33,16 @@ public class ContentSeeder implements CommandLineRunner {
         lesson1.setPublished(true);
         lesson1 = lessonRepository.save(lesson1);
 
-        addContent(lesson1.getId(), "Rizz", "Rizz",
+        addContent(lesson1.getId(), "Rizz",
                 "Natural charm or charisma, especially the ability to attract others effortlessly.",
                 "\"He walked in and instantly had rizz — everyone wanted to talk to him.\"", 1);
-        addContent(lesson1.getId(), "Sigma", "Sigma",
+        addContent(lesson1.getId(), "Sigma",
                 "A person who is self-reliant, independent, and successful without needing social validation. Often used ironically.",
                 "\"He doesn't care what anyone thinks — total sigma grindset.\"", 2);
-        addContent(lesson1.getId(), "Skibidi", "Skibidi",
+        addContent(lesson1.getId(), "Skibidi",
                 "Originally from a viral YouTube series; used to describe something nonsensical, chaotic, or just as filler slang.",
                 "\"That test was so skibidi, I had no idea what was going on.\"", 3);
-        addContent(lesson1.getId(), "Gyatt", "Gyatt",
+        addContent(lesson1.getId(), "Gyatt",
                 "An exclamation of surprise or admiration, often used when someone is impressed by a person's appearance.",
                 "\"Gyatt, did you see that outfit?\"", 4);
 
@@ -55,16 +55,16 @@ public class ContentSeeder implements CommandLineRunner {
         lesson2.setPublished(true);
         lesson2 = lessonRepository.save(lesson2);
 
-        addContent(lesson2.getId(), "No Cap", "No Cap",
+        addContent(lesson2.getId(), "No Cap",
                 "Means \"no lie\" or \"for real\" — used to emphasise that you are being completely honest.",
                 "\"That movie was the best I've ever seen, no cap.\"", 1);
-        addContent(lesson2.getId(), "Bussin", "Bussin",
+        addContent(lesson2.getId(), "Bussin",
                 "Used to describe something that is extremely good, usually food but also applied broadly.",
                 "\"Mum's laksa is bussin, you have to try it.\"", 2);
-        addContent(lesson2.getId(), "Slay", "Slay",
+        addContent(lesson2.getId(), "Slay",
                 "To do something exceptionally well or look incredibly good; an expression of strong approval.",
                 "\"She slayed that presentation — the whole class was impressed.\"", 3);
-        addContent(lesson2.getId(), "It's giving", "It's giving",
+        addContent(lesson2.getId(), "It's giving",
                 "Used to describe the vibe or energy something gives off.",
                 "\"That outfit? It's giving main character energy.\"", 4);
 
@@ -77,27 +77,26 @@ public class ContentSeeder implements CommandLineRunner {
         lesson3.setPublished(true);
         lesson3 = lessonRepository.save(lesson3);
 
-        addContent(lesson3.getId(), "Main Character", "Main Character",
+        addContent(lesson3.getId(), "Main Character",
                 "Acting as if you are the protagonist of your own life story; being confident and self-focused.",
                 "\"She walked into the party like she was the main character — heads turned immediately.\"", 1);
-        addContent(lesson3.getId(), "NPC", "NPC",
+        addContent(lesson3.getId(), "NPC",
                 "Short for Non-Player Character; used to describe someone who acts robotically, follows the crowd, or lacks original thought.",
                 "\"He just agreed with everything the teacher said — total NPC behaviour.\"", 2);
-        addContent(lesson3.getId(), "Era", "Era",
+        addContent(lesson3.getId(), "Era",
                 "A phase or period someone is currently in, often used to describe a personal vibe or obsession.",
                 "\"I'm in my study era right now — no distractions, just books.\"", 3);
-        addContent(lesson3.getId(), "Understood the assignment", "Understood the assignment",
+        addContent(lesson3.getId(), "Understood the assignment",
                 "A compliment meaning someone did exactly what was needed, perfectly nailing the brief or expectation.",
                 "\"Her Halloween costume? She completely understood the assignment.\"", 4);
 
         // TODO: Seed QuizQuestion data here once QuizQuestion entity is available
     }
 
-    private void addContent(Long lessonId, String title, String term,
+    private void addContent(Long lessonId, String term,
                             String description, String example, int orderIndex) {
         Content content = new Content();
         content.setLessonId(lessonId);
-        content.setTitle(title);
         content.setTerm(term);
         content.setDescription(description);
         content.setExample(example);

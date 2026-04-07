@@ -9,9 +9,6 @@ public class ContentRequest {
     @NotNull(message = "Lesson ID is required")
     private Long lessonId;
 
-    @NotBlank(message = "Title is required")
-    private String title;
-
     @NotBlank(message = "Term is required")
     private String term;
 
@@ -25,8 +22,6 @@ public class ContentRequest {
 
     public Long getLessonId() { return lessonId; }
     public void setLessonId(Long lessonId) { this.lessonId = lessonId; }
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
     public String getTerm() { return term; }
     public void setTerm(String term) { this.term = term; }
     public String getDescription() { return description; }

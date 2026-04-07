@@ -26,7 +26,6 @@ public class ContentService {
     public Content createContent(ContentRequest request) {
         Content content = new Content();
         content.setLessonId(request.getLessonId());
-        content.setTitle(request.getTitle());
         content.setTerm(request.getTerm());
         content.setDescription(request.getDescription());
         content.setExample(request.getExample());
@@ -37,7 +36,6 @@ public class ContentService {
     public Content updateContent(Long id, ContentRequest request) {
         Content content = contentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Content not found"));
-        content.setTitle(request.getTitle());
         content.setTerm(request.getTerm());
         content.setDescription(request.getDescription());
         content.setExample(request.getExample());

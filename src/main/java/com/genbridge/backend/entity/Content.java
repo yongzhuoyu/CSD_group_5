@@ -17,9 +17,6 @@ public class Content {
     private Long lessonId;
 
     @Column(nullable = false, length = 200)
-    private String title;
-
-    @Column(nullable = false, length = 100)
     private String term;
 
     @Column(nullable = false, columnDefinition = "TEXT")
@@ -42,8 +39,6 @@ public class Content {
     public Long getId() { return id; }
     public Long getLessonId() { return lessonId; }
     public void setLessonId(Long lessonId) { this.lessonId = lessonId; }
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
     public String getTerm() { return term; }
     public void setTerm(String term) { this.term = term; }
     public String getDescription() { return description; }
