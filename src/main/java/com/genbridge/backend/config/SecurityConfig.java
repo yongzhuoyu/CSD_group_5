@@ -74,6 +74,14 @@ public class SecurityConfig {
 .requestMatchers(HttpMethod.PUT, "/api/quests/*").hasRole("ADMIN")
 .requestMatchers(HttpMethod.DELETE, "/api/quests/*").hasRole("ADMIN")
 
+                // Forum endpoints
+                .requestMatchers(HttpMethod.GET, "/api/forum/posts").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/forum/posts/*").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/forum/posts").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/forum/posts/*/comments").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/forum/posts/*").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/forum/comments/*").hasRole("ADMIN")
+
                 // All other endpoints require any authenticated user
                 .anyRequest().authenticated()
             )

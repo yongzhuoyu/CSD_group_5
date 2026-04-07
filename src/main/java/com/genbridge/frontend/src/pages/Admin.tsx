@@ -44,7 +44,7 @@ export default function Admin() {
 
   if (role !== "ADMIN") return <Navigate to="/lessons" replace />;
 
-  const [tab, setTab] = useState<"lessons" | "content" | "quiz" | "reports">("lessons");
+  const [tab, setTab] = useState<"lessons" | "content" | "quiz" | "reports" | "forum">("lessons");
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loadingLessons, setLoadingLessons] = useState(true);
 
@@ -352,7 +352,7 @@ export default function Admin() {
       <div className="flex-1 ml-72 pt-12 pb-16 px-8">
         <div className="max-w-5xl mx-auto">
           <h1 className="font-display text-3xl font-bold text-foreground mb-8">
-            {tab === "lessons" ? "Lessons" : tab === "content" ? "Content" : tab === "quiz" ? "Quiz" : "Reports"}
+            {tab === "lessons" ? "Lessons" : tab === "content" ? "Content" : tab === "quiz" ? "Quiz" : tab === "reports" ? "Reports" : "Forum Moderation"}
           </h1>
 
           {/* LESSONS TAB */}
@@ -919,8 +919,124 @@ export default function Admin() {
               </div>
             </DialogContent>
           </Dialog>
+          {/* FORUM MODERATION TAB */}
+          {tab === "forum" && <ForumModerationTab toast={toast} />}
+
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── Forum Moderation Tab ────────────────────────────────────────────────────
+
+function ForumModerationTab({ toast }: { toast: ReturnType<typeof import("@/hooks/use-toast").useToast>["toast"] }) {
+  const [posts, setPosts] = useState<{ id: number; userName: string; title: string; body: string; createdAt: string; comments: { id: number; userName: string; body: string; createdAt: string }[] }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [expandedPost, setExpandedPost] = useState<number | null>(null);
+
+  const fetchPosts = async () => {
+    try {
+      const res = await api.get("/forum/posts");
+      const withComments = await Promise.all(
+        res.data.map(async (p: { id: number }) => {
+          const detail = await api.get(`/forum/posts/${p.id}`);
+          return detail.data;
+        })
+      );
+      setPosts(withComments);
+    } catch {
+      toast({ title: "Failed to load forum posts", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchPosts(); }, []);
+
+  const deletePost = async (postId: number) => {
+    try {
+      await api.delete(`/forum/posts/${postId}`);
+      toast({ title: "Post deleted" });
+      fetchPosts();
+    } catch {
+      toast({ title: "Failed to delete post", variant: "destructive" });
+    }
+  };
+
+  const deleteComment = async (commentId: number) => {
+    try {
+      await api.delete(`/forum/comments/${commentId}`);
+      toast({ title: "Comment deleted" });
+      fetchPosts();
+    } catch {
+      toast({ title: "Failed to delete comment", variant: "destructive" });
+    }
+  };
+
+  if (loading) return <p className="text-muted-foreground">Loading...</p>;
+
+  return (
+    <div className="space-y-4">
+      {posts.length === 0 ? (
+        <p className="text-muted-foreground">No forum posts yet.</p>
+      ) : (
+        posts.map((post) => (
+          <div key={post.id} className="bg-card rounded-2xl border border-border overflow-hidden">
+            <div className="flex items-start justify-between gap-4 px-6 py-4">
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-card-foreground text-sm">{post.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  by {post.userName} · {new Date(post.createdAt).toLocaleDateString()} · {post.comments.length} comment(s)
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setExpandedPost(expandedPost === post.id ? null : post.id)}
+                >
+                  {expandedPost === post.id ? "Hide" : "View"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => deletePost(post.id)}
+                >
+                  Delete Post
+                </Button>
+              </div>
+            </div>
+
+            {expandedPost === post.id && (
+              <div className="border-t border-border px-6 py-4 space-y-3">
+                <p className="text-sm text-card-foreground whitespace-pre-wrap">{post.body}</p>
+                {post.comments.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Comments</p>
+                    {post.comments.map((comment) => (
+                      <div key={comment.id} className="flex items-start justify-between gap-3 bg-muted rounded-xl px-4 py-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground mb-1">{comment.userName} · {new Date(comment.createdAt).toLocaleDateString()}</p>
+                          <p className="text-sm text-foreground">{comment.body}</p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => deleteComment(comment.id)}
+                          className="shrink-0"
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))
+      )}
     </div>
   );
 }

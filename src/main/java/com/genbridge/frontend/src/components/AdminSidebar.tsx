@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Flag } from "lucide-react";
+import { LogOut, Flag, MessageCircle } from "lucide-react";
 import BridgeIcon from "@/assets/icons/bridge.svg?react";
 import DictionaryIcon from "@/assets/icons/dictionary.svg?react";
 import NoteStackIcon from "@/assets/icons/note_stack.svg?react";
@@ -8,8 +8,8 @@ import AbcIcon from "@/assets/icons/abc.svg?react";
 import KeepIcon from "@/assets/icons/keep.svg?react";
 
 interface AdminSidebarProps {
-  activeTab: "lessons" | "content" | "quiz" | "reports";
-  onTabChange: (tab: "lessons" | "content" | "quiz" | "reports") => void;
+  activeTab: "lessons" | "content" | "quiz" | "reports" | "forum";
+  onTabChange: (tab: "lessons" | "content" | "quiz" | "reports" | "forum") => void;
 }
 
 const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
@@ -25,10 +25,11 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
   const sidebarW = expanded ? "w-72" : "w-16";
 
   const navItems = [
-    { icon: DictionaryIcon, label: "Lessons", tab: "lessons" as const },
-    { icon: NoteStackIcon,  label: "Content", tab: "content" as const },
-    { icon: AbcIcon,        label: "Quiz",    tab: "quiz"    as const },
-    { icon: Flag,           label: "Reports", tab: "reports" as const },
+    { icon: DictionaryIcon,  label: "Lessons",          tab: "lessons" as const },
+    { icon: NoteStackIcon,   label: "Content",          tab: "content" as const },
+    { icon: AbcIcon,         label: "Quiz",             tab: "quiz"    as const },
+    { icon: Flag,            label: "Reports",          tab: "reports" as const },
+    { icon: MessageCircle,   label: "Forum Moderation", tab: "forum"   as const },
   ];
 
   return (
