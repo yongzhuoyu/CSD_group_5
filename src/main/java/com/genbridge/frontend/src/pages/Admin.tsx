@@ -28,7 +28,6 @@ interface Lesson {
 interface ContentTerm {
   id: number;
   lessonId: number;
-  title: string;
   term: string;
   description: string;
   example: string;
@@ -73,7 +72,6 @@ export default function Admin() {
   };
 
   const emptyContentForm = {
-    title: "",
     term: "",
     description: "",
     example: "",
@@ -265,7 +263,6 @@ export default function Admin() {
       setEditingContent(null);
 
       setContentForm({
-        title: "",
         term: "",
         description: "",
         example: "",
@@ -776,13 +773,6 @@ export default function Admin() {
               </DialogHeader>
 
               <div className="space-y-4 mt-4">
-                <Input
-                  placeholder="Title"
-                  value={contentForm.title}
-                  onChange={(e) =>
-                    setContentForm({ ...contentForm, title: e.target.value })
-                  }
-                />
                 <Input
                   placeholder="Term"
                   value={contentForm.term}
