@@ -1,5 +1,9 @@
 package com.genbridge.backend.config;
 
+import org.springframework.web.cors.*;
+
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,67 +29,68 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults())
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                // Public endpoints — no token needed
-                .requestMatchers(HttpMethod.PUT, "/api/auth/change-password").authenticated()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/health/**").permitAll()
-                .requestMatchers("/error").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html").permitAll()
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // Public endpoints — no token needed
+                        .requestMatchers(HttpMethod.PUT, "/api/auth/change-password").authenticated()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/ai/**").permitAll()
+                        .requestMatchers("/api/health/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html")
+                        .permitAll()
 
-                // Admin-only content management
-                .requestMatchers(HttpMethod.POST, "/api/content").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/content/*").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/content/*").hasRole("ADMIN")
+                        // Admin-only content management
+                        .requestMatchers(HttpMethod.POST, "/api/content").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/content/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/content/*").hasRole("ADMIN")
 
-                // Public lesson endpoints — no token needed
-                .requestMatchers(HttpMethod.GET, "/api/lessons").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/lessons/{id}").permitAll()
+                        // Public lesson endpoints — no token needed
+                        .requestMatchers(HttpMethod.GET, "/api/lessons").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/lessons/{id}").permitAll()
 
-                // Learner: authenticated access to nested lesson endpoints
-                .requestMatchers(HttpMethod.GET, "/api/lessons/{id}/quiz").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/start").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/quiz/submit").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/content/lesson/{lessonId}").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/progress").authenticated()
+                        // Learner: authenticated access to nested lesson endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/lessons/{id}/quiz").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/start").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/quiz/submit").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/content/lesson/{lessonId}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/progress").authenticated()
 
-                // Admin-only lesson management
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/lessons").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/lessons/{id}").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/lessons/{id}").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/quiz").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/lessons/{id}/quiz/{questionId}").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/lessons/{id}/quiz/{questionId}").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/report").authenticated()
+                        // Admin-only lesson management
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/lessons").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/lessons/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/lessons/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/quiz").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/lessons/{id}/quiz/{questionId}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/lessons/{id}/quiz/{questionId}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/report").authenticated()
 
-                // Quest endpoints - authenticated learners
-.requestMatchers(HttpMethod.GET, "/api/quests").authenticated()
-.requestMatchers(HttpMethod.GET, "/api/quests/*").authenticated()
-.requestMatchers(HttpMethod.GET, "/api/quests/completions").authenticated()
-.requestMatchers(HttpMethod.POST, "/api/quests/*/complete").authenticated()
+                        // Quest endpoints - authenticated learners
+                        .requestMatchers(HttpMethod.GET, "/api/quests").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/quests/*").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/quests/completions").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/quests/*/complete").authenticated()
 
-// Admin quest management
-.requestMatchers(HttpMethod.GET, "/api/admin/quests").hasRole("ADMIN")
-.requestMatchers(HttpMethod.POST, "/api/quests").hasRole("ADMIN")
-.requestMatchers(HttpMethod.PUT, "/api/quests/*").hasRole("ADMIN")
-.requestMatchers(HttpMethod.DELETE, "/api/quests/*").hasRole("ADMIN")
+                        // Admin quest management
+                        .requestMatchers(HttpMethod.GET, "/api/admin/quests").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/quests").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/quests/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/quests/*").hasRole("ADMIN")
 
-                // Forum endpoints
-                .requestMatchers(HttpMethod.GET, "/api/forum/posts").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/forum/posts/*").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/forum/posts").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/forum/posts/*/comments").authenticated()
-                .requestMatchers(HttpMethod.DELETE, "/api/forum/posts/*").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/forum/comments/*").hasRole("ADMIN")
+                        // Forum endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/forum/posts").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/forum/posts/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/forum/posts").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/forum/posts/*/comments").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/forum/posts/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/forum/comments/*").hasRole("ADMIN")
 
-                // All other endpoints require any authenticated user
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                        // All other endpoints require any authenticated user
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -93,5 +98,25 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowCredentials(true);
+
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://localhost:5174"));
+
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
     }
 }
