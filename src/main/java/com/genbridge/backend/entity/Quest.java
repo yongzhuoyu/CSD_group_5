@@ -14,26 +14,20 @@ public class Quest {
     @Column(nullable = false, length = 200)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
-    @Column(name = "offline_instruction", columnDefinition = "TEXT")
-    private String offlineInstruction;
+    @Column(name = "instruction", columnDefinition = "TEXT", nullable = false)
+    private String instruction;
 
-    @Column(nullable = false)
-    private boolean published = false;
+    @Column(nullable = false, length = 20)
+    private String difficulty;
 
-    @Column(name = "published_at")
-    private LocalDateTime publishedAt;
-
-    @Column(name = "created_by")
-    private String createdBy;
+    @Column(name = "is_published", nullable = false)
+    private boolean isPublished = false;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
 
     public Quest() {
     }
@@ -58,47 +52,31 @@ public class Quest {
         this.description = description;
     }
 
-    public String getOfflineInstruction() {
-        return offlineInstruction;
+    public String getInstruction() {
+        return instruction;
     }
 
-    public void setOfflineInstruction(String offlineInstruction) {
-        this.offlineInstruction = offlineInstruction;
+    public void setInstruction(String instruction) {
+        this.instruction = instruction;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
     }
 
     public boolean isPublished() {
-        return published;
+        return isPublished;
     }
 
     public void setPublished(boolean published) {
-        this.published = published;
-    }
-
-    public LocalDateTime getPublishedAt() {
-        return publishedAt;
-    }
-
-    public void setPublishedAt(LocalDateTime publishedAt) {
-        this.publishedAt = publishedAt;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
+        this.isPublished = published;
     }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

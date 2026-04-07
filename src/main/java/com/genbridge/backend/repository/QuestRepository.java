@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface QuestRepository extends JpaRepository<Quest, Long> {
-    List<Quest> findByPublishedTrue();
-    Optional<Quest> findByIdAndPublishedTrue(Long id);
+    List<Quest> findByIsPublishedTrue();
+    Optional<Quest> findByIdAndIsPublishedTrue(Long id);
 }

@@ -1,5 +1,6 @@
 package com.genbridge.backend.entity;
 
+import com.genbridge.backend.user.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -21,7 +22,7 @@ public class QuestCompletion {
     private Quest quest;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")
     private User user;
 
     @Column(columnDefinition = "TEXT")

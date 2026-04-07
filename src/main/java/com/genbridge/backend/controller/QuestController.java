@@ -33,11 +33,18 @@ public class QuestController {
     }
 
     @PostMapping("/api/quests/{id}/complete")
-    public ResponseEntity<QuestCompletion> completeQuest(
+    public ResponseEntity<Map<String, Object>> completeQuest(
             @PathVariable Long id,
             @Valid @RequestBody QuestCompletionRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(questService.completeQuest(id, request));
+        QuestCompletion completion = questService.completeQuest(id, request);
+        Map<String, Object> response = new java.util.HashMap<>();
+        response.put("id", completion.getId());
+        response.put("questId", completion.getQuest().getId());
+        response.put("questTitle", completion.getQuest().getTitle());
+        response.put("reflection", completion.getReflection());
+        response.put("completedAt", completion.getCompletedAt());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/api/quests/completions")

@@ -9,9 +9,14 @@ public class QuestRequest {
     @Size(max = 200)
     private String title;
 
+    @NotBlank(message = "Description is required")
     private String description;
 
-    private String offlineInstruction;
+    @NotBlank(message = "Instruction is required")
+    private String instruction;
+
+    @NotBlank(message = "Difficulty is required")
+    private String difficulty;
 
     private boolean published;
 
@@ -34,12 +39,20 @@ public class QuestRequest {
         this.description = description;
     }
 
-    public String getOfflineInstruction() {
-        return offlineInstruction;
+    public String getInstruction() {
+        return instruction;
     }
 
-    public void setOfflineInstruction(String offlineInstruction) {
-        this.offlineInstruction = offlineInstruction;
+    public void setInstruction(String instruction) {
+        this.instruction = instruction;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
     }
 
     public boolean isPublished() {

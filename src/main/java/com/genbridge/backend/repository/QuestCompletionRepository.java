@@ -2,7 +2,7 @@ package com.genbridge.backend.repository;
 
 import com.genbridge.backend.entity.Quest;
 import com.genbridge.backend.entity.QuestCompletion;
-import com.genbridge.backend.entity.User;
+import com.genbridge.backend.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
