@@ -15,9 +15,6 @@ public class QuestRequest {
     @NotBlank(message = "Instruction is required")
     private String instruction;
 
-    @NotBlank(message = "Difficulty is required")
-    private String difficulty;
-
     private boolean published;
 
     public QuestRequest() {
@@ -45,14 +42,6 @@ public class QuestRequest {
 
     public void setInstruction(String instruction) {
         this.instruction = instruction;
-    }
-
-    public String getDifficulty() {
-        return difficulty;
-    }
-
-    public void setDifficulty(String difficulty) {
-        this.difficulty = difficulty;
     }
 
     public boolean isPublished() {

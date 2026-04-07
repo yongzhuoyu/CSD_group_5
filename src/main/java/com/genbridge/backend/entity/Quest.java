@@ -20,9 +20,6 @@ public class Quest {
     @Column(name = "instruction", columnDefinition = "TEXT", nullable = false)
     private String instruction;
 
-    @Column(nullable = false, length = 20)
-    private String difficulty;
-
     @Column(name = "is_published", nullable = false)
     private boolean isPublished = false;
 
@@ -58,14 +55,6 @@ public class Quest {
 
     public void setInstruction(String instruction) {
         this.instruction = instruction;
-    }
-
-    public String getDifficulty() {
-        return difficulty;
-    }
-
-    public void setDifficulty(String difficulty) {
-        this.difficulty = difficulty;
     }
 
     public boolean isPublished() {

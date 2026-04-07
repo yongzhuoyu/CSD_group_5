@@ -100,7 +100,6 @@ public class QuestService {
         quest.setTitle(request.getTitle());
         quest.setDescription(request.getDescription());
         quest.setInstruction(request.getInstruction());
-        quest.setDifficulty(request.getDifficulty());
         quest.setPublished(request.isPublished());
         return questRepository.save(quest);
     }
@@ -112,7 +111,6 @@ public class QuestService {
         quest.setTitle(request.getTitle());
         quest.setDescription(request.getDescription());
         quest.setInstruction(request.getInstruction());
-        quest.setDifficulty(request.getDifficulty());
         quest.setPublished(request.isPublished());
 
         return questRepository.save(quest);
@@ -139,7 +137,6 @@ public class QuestService {
         item.put("title", quest.getTitle());
         item.put("description", quest.getDescription());
         item.put("instruction", quest.getInstruction());
-        item.put("difficulty", quest.getDifficulty());
         item.put("isPublished", quest.isPublished());
         item.put("completed", completed);
         return item;
@@ -151,7 +148,6 @@ public class QuestService {
         item.put("title", quest.getTitle());
         item.put("description", quest.getDescription());
         item.put("instruction", quest.getInstruction());
-        item.put("difficulty", quest.getDifficulty());
         item.put("isPublished", quest.isPublished());
         item.put("completed", completed);
         return item;

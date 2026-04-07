@@ -4,10 +4,9 @@ export interface Quest {
   id: number;
   title: string;
   description: string;
-  offlineInstruction: string;
-  published: boolean;
+  instruction: string;
+  isPublished: boolean;
   completed?: boolean;
-  publishedAt?: string | null;
 }
 
 export interface QuestCompletion {
@@ -21,7 +20,7 @@ export interface QuestCompletion {
 export interface QuestRequest {
   title: string;
   description: string;
-  offlineInstruction: string;
+  instruction: string;
   published: boolean;
 }
 
