@@ -5,7 +5,7 @@ export interface Quest {
   title: string;
   description: string;
   instruction: string;
-  isPublished: boolean;
+  published: boolean;
   completed?: boolean;
 }
 
