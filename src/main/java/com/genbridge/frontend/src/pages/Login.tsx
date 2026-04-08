@@ -28,6 +28,7 @@ const Login = () => {
         const data = await res.json();
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.role);
+        window.dispatchEvent(new Event("gb_login"));
         toast({ title: "Welcome back!", description: "Login successful." });
         navigate("/");
       } else {

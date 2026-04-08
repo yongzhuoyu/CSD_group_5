@@ -37,6 +37,12 @@ public class User {
     @Column(name = "last_active_date")
     private LocalDate lastActiveDate;
 
+    @Column(name = "is_suspended", nullable = false)
+    private boolean isSuspended = false;
+
+    @Column(name = "suspension_reason", columnDefinition = "TEXT")
+    private String suspensionReason;
+
     public User() {}
 
     public User(String name, String email, String passwordHash, String role) {
@@ -97,4 +103,9 @@ public class User {
     public void setLastActiveDate(LocalDate lastActiveDate) {
         this.lastActiveDate = lastActiveDate;
     }
+
+    public boolean isSuspended() { return isSuspended; }
+    public void setSuspended(boolean suspended) { this.isSuspended = suspended; }
+    public String getSuspensionReason() { return suspensionReason; }
+    public void setSuspensionReason(String suspensionReason) { this.suspensionReason = suspensionReason; }
 }

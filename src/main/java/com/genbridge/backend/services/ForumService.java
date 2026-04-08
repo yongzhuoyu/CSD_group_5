@@ -33,7 +33,16 @@ public class ForumService {
                 .collect(Collectors.toList());
     }
 
+    private void checkNotSuspended(User user) {
+        if (user.isSuspended()) {
+            String reason = user.getSuspensionReason() != null ? user.getSuspensionReason() : "Contact support.";
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Your account has been suspended. Reason: " + reason);
+        }
+    }
+
     public ForumPost createPost(User user, String title, String body) {
+        checkNotSuspended(user);
         ForumPost post = new ForumPost();
         post.setUserId(user.getId());
         post.setUserName(user.getName() != null ? user.getName() : user.getEmail());
@@ -53,6 +62,7 @@ public class ForumService {
     }
 
     public ForumComment addComment(User user, Long postId, String body) {
+        checkNotSuspended(user);
         postRepository.findById(postId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
         ForumComment comment = new ForumComment();
