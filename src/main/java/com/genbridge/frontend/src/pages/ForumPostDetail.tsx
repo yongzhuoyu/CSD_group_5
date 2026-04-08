@@ -67,7 +67,7 @@ const ForumPostDetail = () => {
     return (
       <div className="flex min-h-screen bg-background">
         <AppSidebar activePage="forum" />
-        <div className="flex-1 ml-72 pt-12 px-8">
+        <div className="flex-1 ml-0 md:ml-16 lg:ml-72 pt-16 md:pt-12 px-4 md:px-8">
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -80,7 +80,7 @@ const ForumPostDetail = () => {
     <div className="flex min-h-screen bg-background">
       <AppSidebar activePage="forum" />
 
-      <div className="flex-1 ml-72 pt-12 pb-16 px-8">
+      <div className="flex-1 ml-0 md:ml-16 lg:ml-72 pt-16 md:pt-12 pb-16 px-4 md:px-8">
         <div className="max-w-3xl mx-auto">
 
           <button

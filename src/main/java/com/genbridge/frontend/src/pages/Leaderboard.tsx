@@ -15,8 +15,6 @@ interface LeaderboardEntry {
 const Leaderboard = () => {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sidebarExpanded, setSidebarExpanded] = useState(true);
-  const contentML = sidebarExpanded ? "ml-72" : "ml-16";
 
   useEffect(() => {
     api.get("/leaderboard")
@@ -28,7 +26,7 @@ const Leaderboard = () => {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       <AppSidebar activePage="leaderboard" />
-      <main className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-10`}>
+      <main className="flex-1 overflow-y-auto transition-all duration-300 ml-0 md:ml-16 lg:ml-72 pt-16 md:pt-10 pb-10 px-4 md:px-10">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <Trophy className="w-7 h-7 text-primary" />
