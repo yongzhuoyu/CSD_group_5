@@ -31,6 +31,7 @@ interface ContentTerm {
   term: string;
   description: string;
   example: string;
+  source: string;
   orderIndex: number;
 }
 
@@ -83,6 +84,7 @@ export default function Admin() {
     term: "",
     description: "",
     example: "",
+    source: "",
     orderIndex: 0,
   };
 
@@ -343,6 +345,7 @@ export default function Admin() {
         term: "",
         description: "",
         example: "",
+        source: "",
         orderIndex: contentTerms.length + 1,
       });
 
@@ -559,6 +562,7 @@ export default function Admin() {
                         term: "",
                         description: "",
                         example: "",
+                        source: "",
                         orderIndex: contentTerms.length + 1,
                       });
                       setContentModalOpen(true);
@@ -871,6 +875,13 @@ export default function Admin() {
                   value={contentForm.example}
                   onChange={(e) =>
                     setContentForm({ ...contentForm, example: e.target.value })
+                  }
+                />
+                <Input
+                  placeholder='Source (e.g. "Urban Dictionary, 2024" or "Oxford English Dictionary")'
+                  value={contentForm.source}
+                  onChange={(e) =>
+                    setContentForm({ ...contentForm, source: e.target.value })
                   }
                 />
                 <Input

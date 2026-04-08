@@ -17,6 +17,8 @@ public class ContentRequest {
 
     private String example;
 
+    private String source;
+
     @Min(value = 1, message = "Order index must be at least 1")
     private int orderIndex;
 
@@ -28,6 +30,8 @@ public class ContentRequest {
     public void setDescription(String description) { this.description = description; }
     public String getExample() { return example; }
     public void setExample(String example) { this.example = example; }
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
     public int getOrderIndex() { return orderIndex; }
     public void setOrderIndex(int orderIndex) { this.orderIndex = orderIndex; }
 }

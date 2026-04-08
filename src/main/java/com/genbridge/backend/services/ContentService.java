@@ -29,6 +29,7 @@ public class ContentService {
         content.setTerm(request.getTerm());
         content.setDescription(request.getDescription());
         content.setExample(request.getExample());
+        content.setSource(request.getSource());
         content.setOrderIndex(request.getOrderIndex());
         return contentRepository.save(content);
     }
@@ -39,6 +40,7 @@ public class ContentService {
         content.setTerm(request.getTerm());
         content.setDescription(request.getDescription());
         content.setExample(request.getExample());
+        content.setSource(request.getSource());
         content.setOrderIndex(request.getOrderIndex());
         content.setUpdatedAt(LocalDateTime.now());
         return contentRepository.save(content);

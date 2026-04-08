@@ -16,6 +16,8 @@ import {
   ArrowLeft,
   Loader2,
   Flag,
+  ShieldCheck,
+  ExternalLink,
 } from "lucide-react";
 
 interface Lesson {
@@ -33,6 +35,7 @@ interface ContentTerm {
   term: string;
   description: string;
   example: string;
+  source: string;
   orderIndex: number;
 }
 
@@ -327,15 +330,24 @@ const LessonDetail = () => {
                   >
                     <div className="flex items-center gap-2 mb-3">
                       <span className="font-display text-lg font-bold text-primary">{term.term}</span>
+                      <span className="flex items-center gap-1 text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                        <ShieldCheck className="w-3 h-3" /> Verified
+                      </span>
                     </div>
                     <p className="text-foreground/80 leading-relaxed mb-3">{term.description}</p>
                     {term.example && (
-                      <div className="pl-4 border-l-2 border-primary/30">
+                      <div className="pl-4 border-l-2 border-primary/30 mb-3">
                         <p className="text-sm text-muted-foreground flex items-start gap-2">
                           <MessageCircle className="w-4 h-4 text-primary/60 mt-0.5 shrink-0" />
                           {term.example}
                         </p>
                       </div>
+                    )}
+                    {term.source && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
+                        <ExternalLink className="w-3 h-3 shrink-0" />
+                        Source: {term.source}
+                      </p>
                     )}
                   </motion.div>
                 ))}

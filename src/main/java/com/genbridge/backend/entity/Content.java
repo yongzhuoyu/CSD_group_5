@@ -25,6 +25,9 @@ public class Content {
     @Column(columnDefinition = "TEXT")
     private String example;
 
+    @Column(length = 300)
+    private String source;
+
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
 
@@ -45,6 +48,8 @@ public class Content {
     public void setDescription(String description) { this.description = description; }
     public String getExample() { return example; }
     public void setExample(String example) { this.example = example; }
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
     public int getOrderIndex() { return orderIndex; }
     public void setOrderIndex(int orderIndex) { this.orderIndex = orderIndex; }
     public LocalDateTime getCreatedAt() { return createdAt; }
