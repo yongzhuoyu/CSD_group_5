@@ -5,9 +5,11 @@ import com.genbridge.backend.entity.Lesson;
 import com.genbridge.backend.repository.ContentRepository;
 import com.genbridge.backend.repository.LessonRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
+@Order(100)
 public class ContentSeeder implements CommandLineRunner {
 
     private final LessonRepository lessonRepository;
@@ -20,8 +22,12 @@ public class ContentSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (lessonRepository.count() > 0) {
-            return; // Already seeded
+        try {
+            if (lessonRepository.count() > 0) {
+                return; // Already seeded
+            }
+        } catch (Exception e) {
+            return; // Context shutting down during DevTools restart — skip seeding
         }
 
         // Lesson 1: Rizz, Sigma & Skibidi
