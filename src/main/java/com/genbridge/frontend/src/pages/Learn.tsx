@@ -21,6 +21,8 @@ import {
   LogOut,
   Trophy,
   Loader2,
+  Menu,
+  X,
 } from "lucide-react";
 import HomeIcon from "@/assets/icons/home.svg?react";
 import DictionaryIcon from "@/assets/icons/dictionary.svg?react";
@@ -161,7 +163,8 @@ const Learn = () => {
     () => (sessionStorage.getItem("learn_view") as "home" | "learn") ?? "home"
   );
   const [learnedWordsOpen, setLearnedWordsOpen] = useState(false);
-  const [streak] = useState(() => parseInt(localStorage.getItem("gb_streak") ?? "0"));
+const [streak] = useState(() => parseInt(localStorage.getItem("gb_streak") ?? "0"));
+const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const changePage = (page: "home" | "learn") => {
     sessionStorage.setItem("learn_view", page);
@@ -310,12 +313,25 @@ const Learn = () => {
   }, [lessons, searchQuery, selectedTag]);
 
   const sidebarW = sidebarExpanded ? "w-72" : "w-16";
-  const contentML = sidebarExpanded ? "ml-72" : "ml-16";
+const contentML = sidebarExpanded ? "md:ml-72" : "md:ml-16";
 
   // ── Sidebar ────────────────────────────────────────────────────────────────
   const sidebar = (
+  <>
+    <div className="md:hidden fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-4 bg-card border-b border-border">
+      <div className="flex items-center gap-2">
+        <BridgeIcon className="w-5 h-5 text-primary" />
+        <span className="font-bold text-sm">GenBridge</span>
+      </div>
+      <button onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}>
+        {mobileSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </button>
+    </div>
+
     <aside
-      className={`fixed top-0 left-0 h-full z-40 bg-card border-r border-border flex flex-col transition-all duration-300 ${sidebarW}`}
+      className={`fixed top-0 left-0 h-full z-40 bg-card border-r border-border flex flex-col transition-all duration-300 ${sidebarW} ${
+        mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      } md:translate-x-0`}
     >
       {sidebarExpanded ? (
         <div className="flex items-center h-16 px-4 border-b border-border shrink-0 gap-3">
@@ -337,7 +353,7 @@ const Learn = () => {
         <button
           onClick={() => setSidebarExpanded(true)}
           title="Pin sidebar"
-          className="flex items-center justify-center h-16 w-full border-b border-border shrink-0 hover:bg-muted transition-colors"
+          className="hidden md:flex items-center justify-center h-16 w-full border-b border-border shrink-0 hover:bg-muted transition-colors"
         >
           <KeepIcon className="w-4 h-4 text-muted-foreground" />
         </button>
@@ -345,14 +361,21 @@ const Learn = () => {
 
       <nav className="flex-1 p-3 space-y-1 overflow-hidden">
         {([
-          { icon: HomeIcon,       label: "Home",  page: "home"  as const },
+          { icon: HomeIcon, label: "Home", page: "home" as const },
           { icon: DictionaryIcon, label: "Learn", page: "learn" as const },
         ]).map(({ icon: Icon, label, page }) => {
           const isActive = currentPage === page && !selectedLesson;
           return (
             <button
               key={label}
-              onClick={() => { changePage(page); setSelectedLesson(null); setLessonContent([]); setLessonQuiz([]); setShowQuiz(false); }}
+              onClick={() => {
+                changePage(page);
+                setSelectedLesson(null);
+                setLessonContent([]);
+                setLessonQuiz([]);
+                setShowQuiz(false);
+                setMobileSidebarOpen(false);
+              }}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors ${
                 isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
               } ${!sidebarExpanded ? "justify-center" : ""}`}
@@ -362,29 +385,37 @@ const Learn = () => {
             </button>
           );
         })}
+
         <Link
           to="/forum"
+          onClick={() => setMobileSidebarOpen(false)}
           className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
         >
           <ForumIcon className="w-6 h-6 shrink-0" />
           {sidebarExpanded && <span className="whitespace-nowrap">Forum</span>}
         </Link>
+
         <Link
           to="/quests"
+          onClick={() => setMobileSidebarOpen(false)}
           className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
         >
           <Trophy className="w-6 h-6 shrink-0" />
           {sidebarExpanded && <span className="whitespace-nowrap">Quests</span>}
         </Link>
+
         <Link
           to="/profile"
+          onClick={() => setMobileSidebarOpen(false)}
           className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
         >
           <AccountIcon className="w-6 h-6 shrink-0" />
           {sidebarExpanded && <span className="whitespace-nowrap">Profile</span>}
         </Link>
+
         <Link
           to="/settings"
+          onClick={() => setMobileSidebarOpen(false)}
           className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
         >
           <SettingsIcon className="w-6 h-6 shrink-0" />
@@ -405,7 +436,7 @@ const Learn = () => {
             </span>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-2 py-1">
+          <div className="hidden md:flex flex-col items-center gap-2 py-1">
             {streak > 0 && <Flame className="w-5 h-5 text-orange-500" />}
             <Star className="w-5 h-5 text-primary" />
           </div>
@@ -419,7 +450,8 @@ const Learn = () => {
         </button>
       </div>
     </aside>
-  );
+  </>
+);
 
   // ── Quiz view ──────────────────────────────────────────────────────────────
   if (selectedLesson && showQuiz) {
@@ -431,7 +463,7 @@ const Learn = () => {
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
         </AnimatePresence>
         <div className={`flex-1 transition-all duration-300 ${contentML}`}>
-          <div className="py-12 px-8 max-w-2xl mx-auto">
+  <div className="pt-20 md:pt-12 pb-12 px-4 md:px-8 max-w-2xl mx-auto">
             <button
               onClick={() => setShowQuiz(false)}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
@@ -550,7 +582,7 @@ const Learn = () => {
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
         </AnimatePresence>
         <div className={`flex-1 transition-all duration-300 ${contentML}`}>
-          <div className="py-12 px-8 max-w-3xl mx-auto">
+  <div className="pt-20 md:pt-12 pb-12 px-4 md:px-8 max-w-3xl mx-auto">
             <button
               onClick={() => { setSelectedLesson(null); setLessonContent([]); setLessonQuiz([]); }}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
@@ -649,10 +681,10 @@ const Learn = () => {
     return (
       <div className="flex h-screen overflow-hidden bg-background">
         {sidebar}
-        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-10`}>
+        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} pt-20 md:pt-10 pb-10 px-4 md:px-10`}>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
 
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
               <div>
                 <h1 className="font-display text-4xl font-bold text-foreground mb-1">Home</h1>
                 <p className="text-sm text-muted-foreground">Welcome back — let's keep learning.</p>
@@ -665,7 +697,7 @@ const Learn = () => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
 
               {/* My Progress */}
               <div className="rounded-2xl border border-border bg-card p-6">
@@ -707,7 +739,7 @@ const Learn = () => {
                       : `${xpToNext} XP to ${LEVELS[LEVELS.findIndex((l) => l.label === currentLevel.label) + 1].label}`}
                   </p>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="rounded-xl bg-muted/40 p-3 text-center">
                     <p className="font-bold text-2xl text-foreground">{completedCount}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">Lessons done</p>
@@ -730,7 +762,7 @@ const Learn = () => {
                     <NoteStackIcon className="w-6 h-6 text-primary" />
                     <span className="font-display text-xl font-semibold text-card-foreground">My Words</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
                     <button
                       onClick={() => learnedTermsList.length > 0 && setLearnedWordsOpen(true)}
                       className={`rounded-xl bg-primary/5 p-3 text-center w-full transition-colors ${learnedTermsList.length > 0 ? "hover:bg-primary/10 cursor-pointer" : "cursor-default"}`}
@@ -846,7 +878,7 @@ const Learn = () => {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {sidebar}
-      <div className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-8`}>
+      <div className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} pt-20 md:pt-10 pb-10 px-4 md:px-8`}>
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
 
           <div className="mb-6">

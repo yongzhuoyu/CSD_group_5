@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Flame, Star, LogOut, Trophy } from "lucide-react";
+import { Flame, Star, LogOut, Trophy, Menu, X } from "lucide-react";
 import BridgeIcon from "@/assets/icons/bridge.svg?react";
 import ForumIcon from "@/assets/icons/forum.svg?react";
 import HomeIcon from "@/assets/icons/home.svg?react";
@@ -16,6 +16,7 @@ interface AppSidebarProps {
 
 const AppSidebar = ({ activePage }: AppSidebarProps) => {
   const [expanded, setExpanded] = useState(true);
+const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const [streak, setStreak] = useState(0);
   const [xp, setXp] = useState(0);
@@ -45,81 +46,76 @@ const AppSidebar = ({ activePage }: AppSidebarProps) => {
   ] as const;
 
   return (
-    <aside className={`fixed top-0 left-0 h-full z-40 bg-card border-r border-border flex flex-col transition-all duration-300 ${sidebarW}`}>
+  <>
+    {/* Mobile top bar */}
+    <div className="md:hidden fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-4 bg-card border-b border-border">
+      <div className="flex items-center gap-2">
+        <BridgeIcon className="w-5 h-5 text-primary" />
+        <span className="font-bold text-sm">GenBridge</span>
+      </div>
+
+      <button onClick={() => setMobileOpen(!mobileOpen)}>
+        {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </button>
+    </div>
+
+    {/* Sidebar */}
+    <aside
+      className={`
+        fixed top-0 left-0 h-full z-40 bg-card border-r border-border flex flex-col transition-all duration-300
+        ${expanded ? "w-72" : "w-16"}
+        ${mobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0
+      `}
+    >
 
       {/* Header */}
       {expanded ? (
-        <div className="flex items-center h-16 px-4 border-b border-border shrink-0 gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-            <BridgeIcon className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <span className="font-sidebar text-xl font-bold text-foreground whitespace-nowrap flex-1">GenBridge</span>
-          <button
-            onClick={() => setExpanded(false)}
-            title="Collapse sidebar"
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-primary hover:bg-primary/10 transition-colors"
-          >
+        <div className="flex items-center h-16 px-4 border-b border-border gap-3">
+          <BridgeIcon className="w-5 h-5 text-primary" />
+          <span className="font-bold flex-1">GenBridge</span>
+          <button onClick={() => setExpanded(false)}>
             <KeepIcon className="w-4 h-4" />
           </button>
         </div>
       ) : (
-        <button
-          onClick={() => setExpanded(true)}
-          title="Expand sidebar"
-          className="flex items-center justify-center h-16 w-full border-b border-border shrink-0 hover:bg-muted transition-colors"
-        >
-          <KeepIcon className="w-4 h-4 text-muted-foreground" />
+        <button onClick={() => setExpanded(true)} className="h-16">
+          <KeepIcon className="w-4 h-4" />
         </button>
       )}
 
       {/* Nav */}
-      <nav className="flex-1 p-3 space-y-1 overflow-hidden">
+      <nav className="flex-1 p-3 space-y-1">
         {navItems.map(({ icon: Icon, label, href, page }) => {
           const isActive = activePage === page;
           return (
             <Link
               key={label}
               to={href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors ${
-                isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              onClick={() => setMobileOpen(false)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl ${
+                isActive ? "bg-primary/10 text-primary" : "text-muted-foreground"
               } ${!expanded ? "justify-center" : ""}`}
             >
-              <Icon className="w-6 h-6 shrink-0" />
-              {expanded && <span className="whitespace-nowrap">{label}</span>}
+              <Icon className="w-5 h-5" />
+              {expanded && <span>{label}</span>}
             </Link>
           );
         })}
       </nav>
 
       {/* Bottom */}
-      <div className="p-3 border-t border-border space-y-1 shrink-0">
-        {expanded ? (
-          <div className="flex items-center gap-2 px-3 py-1.5">
-            {streak > 0 && (
-              <span className="flex items-center gap-1 text-orange-500 text-xs font-bold">
-                <Flame className="w-4 h-4" />{streak}
-              </span>
-            )}
-            <span className="flex items-center gap-1 text-primary text-xs font-bold ml-auto">
-              <Star className="w-4 h-4" />{xp} XP
-            </span>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-2 py-1">
-            {streak > 0 && <Flame className="w-5 h-5 text-orange-500" />}
-            <Star className="w-5 h-5 text-primary" />
-          </div>
-        )}
+      <div className="p-3 border-t border-border">
         <button
           onClick={handleLogout}
-          className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors ${!expanded ? "justify-center" : ""}`}
+          className="flex items-center gap-2 w-full px-4 py-3"
         >
-          <LogOut className="w-6 h-6 shrink-0" />
-          {expanded && <span>Log out</span>}
+          <LogOut className="w-5 h-5" />
+          {expanded && <span>Logout</span>}
         </button>
       </div>
     </aside>
-  );
+  </>
+);
 };
 
 export default AppSidebar;

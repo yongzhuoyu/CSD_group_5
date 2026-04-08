@@ -58,81 +58,112 @@ const Index = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative overflow-hidden" style={{ height: "82vh", paddingTop: "8rem" }}>
+      {/* Hero */}
+<section className="relative overflow-hidden pt-24 md:pt-32 pb-10 md:pb-16 px-4">
+  <div className="mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-2 items-center gap-8 md:gap-12">
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.7 }}
+      className="order-1"
+    >
+      <img
+        src={heroImage}
+        alt="GenBridge illustration"
+        className="w-full h-auto max-h-[420px] md:max-h-[620px] object-contain mx-auto"
+      />
+    </motion.div>
 
-        {/* Image — fills from left, natural width */}
-        <motion.img
-          src={heroImage}
-          alt="GenBridge illustration"
-          className="absolute left-0 w-auto"
-          style={{ top: "5rem", height: "calc(100% - 5rem)" }}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.7 }}
-        />
-
-        {/* Text panel — floats over the right portion of the image */}
-        <motion.div
-          className="absolute right-0 top-0 bottom-0 flex flex-col justify-center px-10 py-10"
-          style={{ width: "48%", backgroundColor: heroPanelBg, backdropFilter: "blur(6px)" }}
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-        >
-
-          <h1
-            className="font-display font-bold mb-4"
-            style={{ color: "#51905c", fontSize: "clamp(1.8rem, 3vw, 2.8rem)", lineHeight: 1.2 }}
+    <motion.div
+      className="order-2 rounded-3xl p-6 md:p-10"
+      style={{ backgroundColor: heroPanelBg, backdropFilter: "blur(6px)" }}
+      initial={{ opacity: 0, x: 30 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.7, delay: 0.2 }}
+    >
+      <h1
+        className="font-display font-bold mb-4 text-3xl md:text-5xl leading-tight"
+        style={{ color: "#51905c" }}
+      >
+        Finally get what{" "}
+        <span className="relative inline-block">
+          Gen Alpha
+          <motion.svg
+            viewBox="0 0 100 8"
+            preserveAspectRatio="none"
+            style={{
+              position: "absolute",
+              left: "-4px",
+              bottom: "-6px",
+              width: "calc(100% + 8px)",
+              height: "8px",
+              overflow: "visible",
+              pointerEvents: "none",
+            }}
+            initial="hidden"
+            animate="visible"
           >
-            <span className="block" style={{ marginLeft: "0rem" }}>Finally get what</span>
-            <span className="block" style={{ marginLeft: "1.2rem" }}>
-              Gen{" "}
-              <span className="relative inline-block">
-                Alpha
-                {/* Animated underline */}
-                <motion.svg
-                  viewBox="0 0 100 8"
-                  preserveAspectRatio="none"
-                  style={{ position: "absolute", left: "-4px", bottom: "-6px", width: "calc(100% + 8px)", height: "8px", overflow: "visible", pointerEvents: "none" }}
-                  initial="hidden" animate="visible"
-                >
-                  <motion.path
-                    d="M 0 7 L 100 2"
-                    fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="5" strokeLinecap="round"
-                    variants={{
-                      hidden: { pathLength: 0, opacity: 0 },
-                      visible: { pathLength: 1, opacity: 1, transition: { pathLength: { duration: 0.6, delay: 0.9, ease: "easeOut" }, opacity: { duration: 0.01, delay: 0.9 } } },
-                    }}
-                  />
-                </motion.svg>
-              </span>
-            </span>
-            <span className="block" style={{ marginLeft: "2.4rem" }}>is saying.</span>
-          </h1>
-          <p className="text-lg mb-8 leading-relaxed" style={{ color: bodyTextColor, marginLeft: "2.4rem" }}>
-            From "rizz" to "sigma" — learn the slang, memes, and culture your kids, students, or coworkers are speaking fluently.
-          </p>
-          <div className="flex flex-wrap gap-3" style={{ marginLeft: "2.4rem" }}>
-            <Link
-              to="/register"
-              className="btn-3d font-bold text-sm uppercase tracking-widest px-6 py-3 rounded-xl hover:opacity-80 transition-opacity"
-              style={{ backgroundColor: startBtnBg, color: startBtnColor, boxShadow: "0 5px 0 #c8bfad" }}
-            >
-              Start Learning →
-            </Link>
-            {!isLoggedIn && (
-              <Link
-                to="/login"
-                className="btn-3d font-bold text-sm uppercase tracking-widest px-6 py-3 rounded-xl border-2 hover:opacity-80 transition-opacity"
-                style={{ borderColor: "#51905c", color: "#51905c", boxShadow: "0 5px 0 rgba(81,144,92,0.4)" }}
-              >
-                I have an account
-              </Link>
-            )}
-          </div>
-        </motion.div>
+            <motion.path
+              d="M 0 7 L 100 2"
+              fill="none"
+              stroke="rgba(255,255,255,0.75)"
+              strokeWidth="5"
+              strokeLinecap="round"
+              variants={{
+                hidden: { pathLength: 0, opacity: 0 },
+                visible: {
+                  pathLength: 1,
+                  opacity: 1,
+                  transition: {
+                    pathLength: { duration: 0.6, delay: 0.9, ease: "easeOut" },
+                    opacity: { duration: 0.01, delay: 0.9 },
+                  },
+                },
+              }}
+            />
+          </motion.svg>
+        </span>{" "}
+        is saying.
+      </h1>
 
-      </section>
+      <p
+        className="text-base md:text-lg mb-6 md:mb-8 leading-relaxed"
+        style={{ color: bodyTextColor }}
+      >
+        From "rizz" to "sigma" — learn the slang, memes, and culture your kids,
+        students, or coworkers are speaking fluently.
+      </p>
+
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Link
+          to="/register"
+          className="btn-3d font-bold text-sm uppercase tracking-widest px-6 py-3 rounded-xl hover:opacity-80 transition-opacity text-center"
+          style={{
+            backgroundColor: startBtnBg,
+            color: startBtnColor,
+            boxShadow: "0 5px 0 #c8bfad",
+          }}
+        >
+          Start Learning →
+        </Link>
+
+        {!isLoggedIn && (
+          <Link
+            to="/login"
+            className="btn-3d font-bold text-sm uppercase tracking-widest px-6 py-3 rounded-xl border-2 hover:opacity-80 transition-opacity text-center"
+            style={{
+              borderColor: "#51905c",
+              color: "#51905c",
+              boxShadow: "0 5px 0 rgba(81,144,92,0.4)",
+            }}
+          >
+            I have an account
+          </Link>
+        )}
+      </div>
+    </motion.div>
+  </div>
+</section>
 
       {/* Features */}
       <section className="py-20 px-4">
@@ -155,7 +186,7 @@ const Index = () => {
             </p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {features.map((feature, i) => (
               <motion.div
                 key={feature.title}
@@ -214,11 +245,11 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="border-t border-border py-8 px-4">
-        <div className="container mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="container mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
             © 2026 GenBridge. All rights reserved.
           </p>
-          <div className="flex gap-6 text-sm text-muted-foreground">
+          <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6 text-sm text-muted-foreground">
             <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
             <a href="#" className="hover:text-foreground transition-colors">Terms</a>
             <a href="#" className="hover:text-foreground transition-colors">Contact</a>

@@ -122,7 +122,7 @@ const Profile = () => {
     <div className="flex min-h-screen bg-background">
       <AppSidebar activePage="profile" />
 
-      <div className="flex-1 ml-72 pt-12 pb-16 px-8">
+      <div className="flex-1 md:ml-72 pt-20 md:pt-12 pb-16 px-4 md:px-8">
         <div className="max-w-3xl mx-auto">
 
           {/* Page title */}
@@ -142,7 +142,7 @@ const Profile = () => {
             className="bg-card rounded-2xl border border-border mb-6 overflow-hidden"
           >
             {/* Avatar + editable fields */}
-            <div className="flex items-start gap-5 p-6 border-b border-border">
+            <div className="flex flex-col md:flex-row items-start gap-5 p-6 border-b border-border">
               <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center shrink-0 shadow">
                 <span className="font-display text-xl font-bold text-primary-foreground">
                   {getInitials(name)}
@@ -200,7 +200,7 @@ const Profile = () => {
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-3 divide-x divide-border">
+            <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
               <div className="flex flex-col items-center gap-1 py-5">
                 <div className="flex items-center gap-1.5 mb-1">
                   <Flame className="w-4 h-4 text-orange-500" />

@@ -73,7 +73,7 @@ description: error.response?.data?.message || error.response?.data || "Something
     <div className="flex min-h-screen bg-background">
       <AppSidebar activePage="settings" />
 
-      <div className="flex-1 ml-72 pt-12 pb-16 px-8">
+      <div className="flex-1 md:ml-72 pt-20 md:pt-12 pb-16 px-4 md:px-8">
         <div className="max-w-3xl mx-auto">
 
           <motion.h1
