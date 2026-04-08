@@ -10,7 +10,7 @@ A self-learning platform that helps parents and teachers understand Gen-Alpha cu
 - [Features](#features)
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
-- [API Reference](#api-reference)
+- [API Documentation](#api-documentation)
 - [Testing](#testing)
 - [Deployment](#deployment)
 - [Data Model](#data-model)
@@ -19,7 +19,7 @@ A self-learning platform that helps parents and teachers understand Gen-Alpha cu
 
 ## Overview
 
-viding structured, admin-curated lessons on modern slang and internet culture. Learners earn XP and streaks by completing lessons and quizzes, take on offline quests, and engage with a community forum.
+GenBridge bridges the generational gap by providing structured, admin-curated lessons on modern slang and internet culture. Learners earn XP and streaks by completing lessons and quizzes, take on offline quests, and engage with a community forum.
 
 ---
 
@@ -201,93 +201,13 @@ Production config reads from env vars via `application-prod.properties`.
 
 ---
 
-## API Reference
+## API Documentation
 
-Full interactive docs available at `/swagger-ui.html` when the backend is running.
+Full API documentation is available via Swagger UI when the backend is running:
 
-### Authentication
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/auth/register` | Public | Register as learner |
-| `POST` | `/api/auth/login` | Public | Login, returns JWT |
-| `PUT` | `/api/auth/change-password` | User | Change password |
-
-### Lessons
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/lessons` | Public | List published lessons |
-| `GET` | `/api/lessons/{id}` | Public | Get lesson details |
-| `POST` | `/api/lessons` | Admin | Create lesson |
-| `PUT` | `/api/lessons/{id}` | Admin | Update lesson |
-| `DELETE` | `/api/lessons/{id}` | Admin | Delete lesson |
-| `GET` | `/api/admin/lessons` | Admin | All lessons (incl. unpublished) |
-
-### Content (Vocabulary Terms)
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/content/lesson/{lessonId}` | User | Get terms for a lesson |
-| `POST` | `/api/content` | Admin | Add term |
-| `PUT` | `/api/content/{id}` | Admin | Update term |
-| `DELETE` | `/api/content/{id}` | Admin | Delete term |
-
-### Quizzes
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/lessons/{id}/quiz` | User | Get quiz questions |
-| `POST` | `/api/lessons/{id}/quiz/submit` | User | Submit answers |
-| `POST` | `/api/lessons/{id}/quiz` | Admin | Add question |
-| `PUT` | `/api/lessons/{id}/quiz/{questionId}` | Admin | Update question |
-| `DELETE` | `/api/lessons/{id}/quiz/{questionId}` | Admin | Delete question |
-
-### Progress & Profile
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/lessons/{id}/start` | User | Mark lesson started |
-| `GET` | `/api/progress` | User | Get all lesson progress |
-| `GET` | `/api/profile` | User | Get streak, XP, completions |
-
-### Forum
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/forum/posts` | User | List posts |
-| `POST` | `/api/forum/posts` | User | Create post |
-| `GET` | `/api/forum/posts/{id}` | User | Get post with comments |
-| `POST` | `/api/forum/posts/{id}/comments` | User | Add comment |
-| `DELETE` | `/api/forum/posts/{id}` | Admin | Delete post |
-| `DELETE` | `/api/forum/comments/{id}` | Admin | Delete comment |
-
-### Quests
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/quests` | User | List quests |
-| `GET` | `/api/quests/{id}` | User | Get quest details |
-| `POST` | `/api/quests/{id}/complete` | User | Submit reflection |
-| `GET` | `/api/quests/completions` | User | Get completed quests |
-| `POST` | `/api/quests` | Admin | Create quest |
-| `PUT` | `/api/quests/{id}` | Admin | Update quest |
-| `DELETE` | `/api/quests/{id}` | Admin | Delete quest |
-
-### Content Reports
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/lessons/{lessonId}/report` | User | Report a lesson |
-| `GET` | `/api/admin/reports` | Admin | View all reports |
-| `PUT` | `/api/admin/reports/{reportId}/resolve` | Admin | Resolve report |
-
-### User Moderation
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/admin/users` | Admin | List all users |
-| `POST` | `/api/admin/users/{userId}/warn` | Admin | Warn user |
-| `POST` | `/api/admin/users/{userId}/suspend` | Admin | Suspend user |
-| `POST` | `/api/admin/users/{userId}/unsuspend` | Admin | Restore user |
-| `GET` | `/me/warnings/unread` | User | Unread warnings |
-| `POST` | `/me/warnings/read` | User | Mark warnings read |
-
-### Health
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/health` | Health check |
+```
+http://localhost:8080/swagger-ui.html
+```
 
 ---
 
