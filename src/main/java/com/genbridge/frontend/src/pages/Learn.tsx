@@ -17,21 +17,22 @@ import {
   ArrowLeft,
   Zap,
   Search,
+  Loader2,
   Flame,
   LogOut,
   Trophy,
-  Loader2,
 } from "lucide-react";
-import HomeIcon from "@/assets/icons/home.svg?react";
-import DictionaryIcon from "@/assets/icons/dictionary.svg?react";
-import AccountIcon from "@/assets/icons/account.svg?react";
 import NoteStackIcon from "@/assets/icons/note_stack.svg?react";
 import BarChartIcon from "@/assets/icons/bar_chart.svg?react";
 import EmojiObjectsIcon from "@/assets/icons/emoji_objects.svg?react";
+import BridgeIcon from "@/assets/icons/bridge.svg?react";
 import ForumIcon from "@/assets/icons/forum.svg?react";
+import HomeIcon from "@/assets/icons/home.svg?react";
+import DictionaryIcon from "@/assets/icons/dictionary.svg?react";
+import AccountIcon from "@/assets/icons/account.svg?react";
 import KeepIcon from "@/assets/icons/keep.svg?react";
 import SettingsIcon from "@/assets/icons/settings.svg?react";
-import BridgeIcon from "@/assets/icons/bridge.svg?react";
+import AppSidebar from "@/components/AppSidebar";
 import { useUserProgress } from "@/hooks/useUserProgress";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -132,7 +133,7 @@ function XPCelebration({ xp, onClose }: { xp: number; onClose: () => void }) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const Learn = () => {
-  const { xp, completedLessons, completeLesson } = useUserProgress();
+  const { xp, streak, completedLessons, completeLesson } = useUserProgress();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -166,10 +167,17 @@ const Learn = () => {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const currentPage: "home" | "learn" = location.pathname === "/lessons" ? "learn" : "home";
   const [learnedWordsOpen, setLearnedWordsOpen] = useState(false);
-  const [streak] = useState(() => parseInt(localStorage.getItem("gb_streak") ?? "0"));
 
   const changePage = (page: "home" | "learn") => {
     navigate(page === "home" ? "/home" : "/lessons");
+  };
+
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/login");
   };
 
   // Keep a ref so popstate handler always sees the latest selectedLesson
@@ -271,12 +279,6 @@ const Learn = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    navigate("/login");
-  };
-
   // ── Derived stats ──────────────────────────────────────────────────────────
   const completedCount = lessons.filter(l => progressMap[l.id] === true).length;
   const totalCount = lessons.length;
@@ -313,25 +315,21 @@ const Learn = () => {
     });
   }, [lessons, searchQuery, selectedTag]);
 
+  // ── Inline sidebar (preserves Home/Learn tab switching) ───────────────────
   const sidebarW = sidebarExpanded ? "w-72" : "w-16";
   const contentML = sidebarExpanded ? "ml-72" : "ml-16";
 
-  // ── Sidebar ────────────────────────────────────────────────────────────────
   const sidebar = (
-    <aside
-      className={`fixed top-0 left-0 h-full z-40 bg-card border-r border-border flex flex-col transition-all duration-300 ${sidebarW}`}
-    >
+    <aside className={`fixed top-0 left-0 h-full z-40 bg-card border-r border-border flex flex-col transition-all duration-300 ${sidebarW}`}>
       {sidebarExpanded ? (
         <div className="flex items-center h-16 px-4 border-b border-border shrink-0 gap-3">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <BridgeIcon className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="font-sidebar text-xl font-bold text-foreground whitespace-nowrap flex-1">
-            GenBridge
-          </span>
+          <span className="font-sidebar text-xl font-bold text-foreground whitespace-nowrap flex-1">GenBridge</span>
           <button
             onClick={() => setSidebarExpanded(false)}
-            title="Unpin sidebar"
+            title="Collapse sidebar"
             className="w-7 h-7 rounded-lg flex items-center justify-center text-primary hover:bg-primary/10 transition-colors"
           >
             <KeepIcon className="w-4 h-4" />
@@ -340,7 +338,7 @@ const Learn = () => {
       ) : (
         <button
           onClick={() => setSidebarExpanded(true)}
-          title="Pin sidebar"
+          title="Expand sidebar"
           className="flex items-center justify-center h-16 w-full border-b border-border shrink-0 hover:bg-muted transition-colors"
         >
           <KeepIcon className="w-4 h-4 text-muted-foreground" />
@@ -367,6 +365,13 @@ const Learn = () => {
             </Link>
           );
         })}
+        <Link
+          to="/glossary"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
+        >
+          <BookOpen className="w-6 h-6 shrink-0" />
+          {sidebarExpanded && <span className="whitespace-nowrap">Glossary</span>}
+        </Link>
         <Link
           to="/forum"
           className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
@@ -431,11 +436,11 @@ const Learn = () => {
     const allAnswered = lessonQuiz.length > 0 && lessonQuiz.every((q) => quizAnswers[q.id] !== undefined);
     return (
       <div className="flex min-h-screen bg-background">
-        {sidebar}
+        <AppSidebar activePage="learn" />
         <AnimatePresence>
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
         </AnimatePresence>
-        <div className={`flex-1 transition-all duration-300 ${contentML}`}>
+        <div className={`flex-1 transition-all duration-300 ml-72`}>
           <div className="py-12 px-8 max-w-2xl mx-auto">
             <button
               onClick={() => setShowQuiz(false)}
@@ -550,11 +555,11 @@ const Learn = () => {
     const isComplete = progressMap[selectedLesson.id] === true;
     return (
       <div className="flex min-h-screen bg-background">
-        {sidebar}
+        <AppSidebar activePage="learn" />
         <AnimatePresence>
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
         </AnimatePresence>
-        <div className={`flex-1 transition-all duration-300 ${contentML}`}>
+        <div className={`flex-1 transition-all duration-300 ml-72`}>
           <div className="py-12 px-8 max-w-3xl mx-auto">
             <button
               onClick={() => { setSelectedLesson(null); setLessonContent([]); setLessonQuiz([]); }}

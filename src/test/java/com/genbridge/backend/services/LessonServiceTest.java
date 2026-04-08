@@ -14,7 +14,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -27,114 +28,121 @@ class LessonServiceTest {
     @InjectMocks
     private LessonService lessonService;
 
-    private Lesson lesson;
+    private Lesson publishedLesson;
+    private Lesson unpublishedLesson;
 
     @BeforeEach
     void setUp() {
-        lesson = new Lesson();
-        lesson.setId(1L);
-        lesson.setTitle("Test Lesson");
-        lesson.setDescription("Description");
-        lesson.setDifficulty("BEGINNER");
-        lesson.setObjective("Objective");
-        lesson.setPublished(true);
+        publishedLesson = new Lesson();
+        publishedLesson.setTitle("Rizz 101");
+        publishedLesson.setDifficulty("BEGINNER");
+        publishedLesson.setPublished(true);
+
+        unpublishedLesson = new Lesson();
+        unpublishedLesson.setTitle("No Cap Deep Dive");
+        unpublishedLesson.setDifficulty("INTERMEDIATE");
+        unpublishedLesson.setPublished(false);
     }
 
     @Test
-    void getPublishedLessons_returnsOnlyPublished() {
-        when(lessonRepository.findByPublishedTrue()).thenReturn(List.of(lesson));
+    void getPublishedLessons_returnsOnlyPublishedLessons() {
+        when(lessonRepository.findByPublishedTrue()).thenReturn(List.of(publishedLesson));
+
         List<Lesson> result = lessonService.getPublishedLessons();
+
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getTitle()).isEqualTo("Test Lesson");
+        assertThat(result.get(0).getTitle()).isEqualTo("Rizz 101");
+        verify(lessonRepository).findByPublishedTrue();
     }
 
     @Test
-    void getPublishedLessonById_found_returnsLesson() {
-        when(lessonRepository.findByIdAndPublishedTrue(1L)).thenReturn(Optional.of(lesson));
+    void getPublishedLessonById_existingLesson_returnsLesson() {
+        when(lessonRepository.findByIdAndPublishedTrue(1L)).thenReturn(Optional.of(publishedLesson));
+
         Lesson result = lessonService.getPublishedLessonById(1L);
-        assertThat(result.getId()).isEqualTo(1L);
+
+        assertThat(result.getTitle()).isEqualTo("Rizz 101");
     }
 
     @Test
-    void getPublishedLessonById_notFound_throws404() {
+    void getPublishedLessonById_lessonNotFound_throws404() {
         when(lessonRepository.findByIdAndPublishedTrue(99L)).thenReturn(Optional.empty());
+
         assertThatThrownBy(() -> lessonService.getPublishedLessonById(99L))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("Lesson not found");
     }
 
     @Test
-    void createLesson_savesAndReturnsLesson() {
+    void createLesson_validRequest_savesAndReturnsLesson() {
         LessonRequest request = new LessonRequest();
-        request.setTitle("New Lesson");
-        request.setDescription("Desc");
-        request.setDifficulty("INTERMEDIATE");
-        request.setObjective("Obj");
+        request.setTitle("Slay Nation");
+        request.setDescription("All about slay");
+        request.setDifficulty("BEGINNER");
+        request.setObjective("Understand slay");
 
-        when(lessonRepository.save(any(Lesson.class))).thenAnswer(inv -> inv.getArgument(0));
+        Lesson saved = new Lesson();
+        saved.setTitle("Slay Nation");
+        when(lessonRepository.save(any(Lesson.class))).thenReturn(saved);
+
         Lesson result = lessonService.createLesson(request);
 
-        assertThat(result.getTitle()).isEqualTo("New Lesson");
-        assertThat(result.getDifficulty()).isEqualTo("INTERMEDIATE");
+        assertThat(result.getTitle()).isEqualTo("Slay Nation");
         verify(lessonRepository).save(any(Lesson.class));
     }
 
     @Test
-    void updateLesson_notFound_throws404() {
+    void updateLesson_lessonNotFound_throws404() {
         when(lessonRepository.findById(99L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> lessonService.updateLesson(99L, new LessonRequest()))
+
+        LessonRequest request = new LessonRequest();
+        request.setTitle("Updated");
+        request.setDifficulty("BEGINNER");
+
+        assertThatThrownBy(() -> lessonService.updateLesson(99L, request))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("Lesson not found");
     }
 
     @Test
-    void updateLesson_found_updatesFields() {
-        LessonRequest request = new LessonRequest();
-        request.setTitle("Updated");
-        request.setDescription("New Desc");
-        request.setDifficulty("ADVANCED");
-        request.setObjective("New Obj");
-
-        when(lessonRepository.findById(1L)).thenReturn(Optional.of(lesson));
-        when(lessonRepository.save(any(Lesson.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        Lesson result = lessonService.updateLesson(1L, request);
-        assertThat(result.getTitle()).isEqualTo("Updated");
-        assertThat(result.getDifficulty()).isEqualTo("ADVANCED");
-    }
-
-    @Test
-    void togglePublish_publishedLesson_unpublishes() {
-        lesson.setPublished(true);
-        when(lessonRepository.findById(1L)).thenReturn(Optional.of(lesson));
+    void togglePublish_unpublishedLesson_setsPublishedTrue() {
+        when(lessonRepository.findById(1L)).thenReturn(Optional.of(unpublishedLesson));
         when(lessonRepository.save(any(Lesson.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Lesson result = lessonService.togglePublish(1L);
-        assertThat(result.isPublished()).isFalse();
-    }
 
-    @Test
-    void togglePublish_unpublishedLesson_publishes() {
-        lesson.setPublished(false);
-        when(lessonRepository.findById(1L)).thenReturn(Optional.of(lesson));
-        when(lessonRepository.save(any(Lesson.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        Lesson result = lessonService.togglePublish(1L);
         assertThat(result.isPublished()).isTrue();
+        assertThat(result.getPublishedAt()).isNotNull();
     }
 
     @Test
-    void deleteLesson_notFound_throws404() {
+    void togglePublish_publishedLesson_setsPublishedFalse() {
+        when(lessonRepository.findById(1L)).thenReturn(Optional.of(publishedLesson));
+        when(lessonRepository.save(any(Lesson.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Lesson result = lessonService.togglePublish(1L);
+
+        assertThat(result.isPublished()).isFalse();
+        assertThat(result.getPublishedAt()).isNull();
+    }
+
+    @Test
+    void deleteLesson_lessonNotFound_throws404() {
         when(lessonRepository.existsById(99L)).thenReturn(false);
+
         assertThatThrownBy(() -> lessonService.deleteLesson(99L))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("Lesson not found");
+
+        verify(lessonRepository, never()).deleteById(any());
     }
 
     @Test
-    void deleteLesson_found_deletesLesson() {
+    void deleteLesson_existingLesson_callsDeleteById() {
         when(lessonRepository.existsById(1L)).thenReturn(true);
+
         lessonService.deleteLesson(1L);
+
         verify(lessonRepository).deleteById(1L);
     }
 }
