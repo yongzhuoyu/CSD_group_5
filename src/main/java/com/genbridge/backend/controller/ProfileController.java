@@ -69,7 +69,18 @@ public class ProfileController {
                 })
                 .collect(Collectors.toList());
 
-        int xp = completedLessons.size() * 10 + completedQuests.size() * 15;
+        int xp = completedProgress.stream()
+                .mapToInt(p -> {
+                    return lessonRepository.findById(p.getLessonId())
+                            .map(l -> {
+                                String diff = l.getDifficulty();
+                                if ("INTERMEDIATE".equalsIgnoreCase(diff) || "Intermediate".equalsIgnoreCase(diff)) return 15;
+                                if ("ADVANCED".equalsIgnoreCase(diff) || "Advanced".equalsIgnoreCase(diff)) return 20;
+                                return 10; // BEGINNER or unknown
+                            })
+                            .orElse(10);
+                })
+                .sum() + completedQuests.size() * 15;
 
         Map<String, Object> profile = new HashMap<>();
         profile.put("id", user.getId());
