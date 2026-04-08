@@ -1,20 +1,20 @@
 package com.genbridge.backend.user;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -31,6 +31,8 @@ public class User {
     @Column(nullable = false, length = 30)
     private String role = "LEARNER";
 
+    /** Null-safe: returns 0 when no streak has been recorded yet. */
+    @Getter(lombok.AccessLevel.NONE)
     @Column(name = "current_streak")
     private Integer currentStreak = 0;
 
@@ -38,12 +40,10 @@ public class User {
     private LocalDate lastActiveDate;
 
     @Column(name = "is_suspended", nullable = false)
-    private boolean isSuspended = false;
+    private boolean suspended = false;
 
     @Column(name = "suspension_reason", columnDefinition = "TEXT")
     private String suspensionReason;
-
-    public User() {}
 
     public User(String name, String email, String passwordHash, String role) {
         this.name = name;
@@ -52,60 +52,8 @@ public class User {
         this.role = role;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
+    /** Returns the current streak, defaulting to 0 if null. */
     public int getCurrentStreak() {
         return currentStreak == null ? 0 : currentStreak;
     }
-
-    public void setCurrentStreak(Integer currentStreak) {
-        this.currentStreak = currentStreak;
-    }
-
-    public LocalDate getLastActiveDate() {
-        return lastActiveDate;
-    }
-
-    public void setLastActiveDate(LocalDate lastActiveDate) {
-        this.lastActiveDate = lastActiveDate;
-    }
-
-    public boolean isSuspended() { return isSuspended; }
-    public void setSuspended(boolean suspended) { this.isSuspended = suspended; }
-    public String getSuspensionReason() { return suspensionReason; }
-    public void setSuspensionReason(String suspensionReason) { this.suspensionReason = suspensionReason; }
 }

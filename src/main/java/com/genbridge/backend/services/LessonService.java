@@ -11,6 +11,10 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Service for managing lessons, including CRUD operations and publish/unpublish toggling.
+ * All methods run within a transaction; read-only queries use a read-only transaction hint.
+ */
 @Service
 @Transactional
 public class LessonService {
@@ -21,10 +25,12 @@ public class LessonService {
         this.lessonRepository = lessonRepository;
     }
 
+    /** Returns all lessons that are currently marked as published. */
     public List<Lesson> getPublishedLessons() {
         return lessonRepository.findByPublishedTrue();
     }
 
+    /** Returns a single published lesson by ID, or throws 404 if not found or unpublished. */
     public Lesson getPublishedLessonById(Long id) {
         return lessonRepository.findByIdAndPublishedTrue(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));

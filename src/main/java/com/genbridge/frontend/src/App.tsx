@@ -28,6 +28,7 @@ import Quests from "./pages/Quests";
 import QuestDetail from "./pages/QuestDetail";
 import Forum from "./pages/Forum";
 import ForumPostDetail from "./pages/ForumPostDetail";
+import Glossary from "./pages/Glossary";
 const queryClient = new QueryClient();
 
 // Redirects to /login if no token
@@ -118,7 +119,7 @@ const WarningModal = () => {
   }, []);
 
   const dismiss = async () => {
-    try { await api.post("/me/warnings/read"); } catch {}
+    try { await api.patch("/me/warnings"); } catch {}
     setWarnings([]);
   };
 
@@ -221,6 +222,7 @@ const App = () => (
 
           <Route path="/admin" element={<AdminRoute />} />
 
+          <Route path="/glossary" element={<PrivateRoute element={<Glossary />} />} />
           <Route path="/forum" element={<PrivateRoute element={<Forum />} />} />
           <Route path="/forum/:id" element={<PrivateRoute element={<ForumPostDetail />} />} />
           <Route path="/quests" element={<PrivateRoute element={<Quests />} />} />

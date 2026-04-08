@@ -13,6 +13,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+/**
+ * Service for handling learner-submitted factual error reports on lessons.
+ * Admins can view all reports and resolve them; a lesson is auto-unpublished after 3 unique reports.
+ */
 @Service
 @Transactional
 public class ContentReportService {

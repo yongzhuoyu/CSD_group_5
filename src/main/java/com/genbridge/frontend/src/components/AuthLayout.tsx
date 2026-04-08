@@ -21,6 +21,8 @@ const AuthLayout = ({ children, title, subtitle }: AuthLayoutProps) => {
     "--input": "220 15% 90%",
     "--primary": "130 28% 44%",
     "--primary-foreground": "0 0% 100%",
+    "--ring": "130 28% 44%",
+    color: "hsl(220 40% 13%)",
   } as React.CSSProperties;
 
   return (

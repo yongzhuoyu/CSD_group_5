@@ -47,8 +47,9 @@ public class SecurityConfig {
 
                 // Learner: authenticated access to nested lesson endpoints
                 .requestMatchers(HttpMethod.GET, "/api/lessons/{id}/quiz").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/start").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/quiz/submit").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/progress").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/quiz/attempts").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/content/glossary").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/content/lesson/{lessonId}").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/progress").authenticated()
 
@@ -56,6 +57,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/lessons").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/lessons/{id}").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/lessons/{id}/published").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/lessons/{id}").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/quiz").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/lessons/{id}/quiz/{questionId}").hasRole("ADMIN")
@@ -66,7 +68,7 @@ public class SecurityConfig {
 .requestMatchers(HttpMethod.GET, "/api/quests").authenticated()
 .requestMatchers(HttpMethod.GET, "/api/quests/*").authenticated()
 .requestMatchers(HttpMethod.GET, "/api/quests/completions").authenticated()
-.requestMatchers(HttpMethod.POST, "/api/quests/*/complete").authenticated()
+.requestMatchers(HttpMethod.POST, "/api/quests/*/completions").authenticated()
 
 // Admin quest management
 .requestMatchers(HttpMethod.GET, "/api/admin/quests").hasRole("ADMIN")

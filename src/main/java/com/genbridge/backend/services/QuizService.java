@@ -19,6 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Service for quiz question management and quiz submission scoring.
+ * Handles per-lesson quiz retrieval, answer grading, lesson completion tracking,
+ * and streak updates after each submission.
+ */
 @Service
 @Transactional
 public class QuizService {

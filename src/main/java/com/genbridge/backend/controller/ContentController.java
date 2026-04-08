@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * REST controller for content term management.
+ * Provides the public glossary endpoint, per-lesson content retrieval, and admin CRUD operations.
+ */
 @RestController
 @RequestMapping("/api/content")
 public class ContentController {
@@ -18,6 +22,12 @@ public class ContentController {
 
     public ContentController(ContentService contentService) {
         this.contentService = contentService;
+    }
+
+    // LEARNER: Get all content terms (glossary)
+    @GetMapping("/glossary")
+    public ResponseEntity<List<Content>> getAllContent() {
+        return ResponseEntity.ok(contentService.getAllContent());
     }
 
     // LEARNER: Get all content terms for a lesson

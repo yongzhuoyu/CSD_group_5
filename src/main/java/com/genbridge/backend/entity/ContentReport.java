@@ -1,11 +1,17 @@
 package com.genbridge.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "content_reports")
+@Getter
+@Setter
+@NoArgsConstructor
 public class ContentReport {
 
     @Id
@@ -17,7 +23,7 @@ public class ContentReport {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id", insertable = false, updatable = false)
-    private com.genbridge.backend.entity.Lesson lesson;
+    private Lesson lesson;
 
     @Column(name = "reported_by", nullable = false)
     private UUID reportedBy;
@@ -29,22 +35,10 @@ public class ContentReport {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    /** Status of this report: OPEN or RESOLVED. */
     @Column(nullable = false, length = 20)
-    private String status = "OPEN"; // OPEN, RESOLVED
+    private String status = "OPEN";
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    public ContentReport() {}
-
-    public Long getId() { return id; }
-    public Long getLessonId() { return lessonId; }
-    public void setLessonId(Long lessonId) { this.lessonId = lessonId; }
-    public UUID getReportedBy() { return reportedBy; }
-    public void setReportedBy(UUID reportedBy) { this.reportedBy = reportedBy; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
 }

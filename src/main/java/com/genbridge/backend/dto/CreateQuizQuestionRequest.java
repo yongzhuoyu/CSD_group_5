@@ -5,9 +5,11 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 public class CreateQuizQuestionRequest {
 
     @NotBlank(message = "Question text is required")
@@ -22,36 +24,4 @@ public class CreateQuizQuestionRequest {
     private int correctIndex;
 
     private String explanation;
-
-    public String getQuestionText() {
-        return questionText;
-    }
-
-    public void setQuestionText(String questionText) {
-        this.questionText = questionText;
-    }
-
-    public List<String> getOptions() {
-        return options;
-    }
-
-    public void setOptions(List<String> options) {
-        this.options = options;
-    }
-
-    public int getCorrectIndex() {
-        return correctIndex;
-    }
-
-    public void setCorrectIndex(int correctIndex) {
-        this.correctIndex = correctIndex;
-    }
-
-    public String getExplanation() {
-        return explanation;
-    }
-
-    public void setExplanation(String explanation) {
-        this.explanation = explanation;
-    }
 }

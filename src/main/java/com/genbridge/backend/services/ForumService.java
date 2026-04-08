@@ -16,6 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Service for managing forum posts and comments.
+ * Admins can delete any post or comment; learners can create posts and add comments.
+ * Deleting a post cascades to delete all its comments.
+ */
 @Service
 public class ForumService {
 

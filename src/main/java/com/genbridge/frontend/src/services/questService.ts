@@ -40,7 +40,7 @@ const questService = {
   },
 
   completeQuest: async (id: string | number, payload: QuestCompletionRequest) => {
-    const res = await api.post(`/quests/${id}/complete`, payload);
+    const res = await api.post(`/quests/${id}/completions`, payload);
     return res.data;
   },
 
