@@ -78,7 +78,13 @@ const Profile = () => {
             difficulty: l.difficulty,
           }))
         );
-        setCompletedQuests(profileRes.data.completedQuests ?? []);
+        setCompletedQuests(
+          (profileRes.data.completedQuests ?? []).map((q: { questId: number; questTitle: string; completedAt: string }) => ({
+            id: q.questId,
+            title: q.questTitle,
+            submittedAt: q.completedAt,
+          }))
+        );
       } catch {
         toast({ title: "Error loading profile" });
       }
