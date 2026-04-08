@@ -123,7 +123,7 @@ function XPCelebration({ xp, onClose }: { xp: number; onClose: () => void }) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const Learn = () => {
-  const { xp, completedLessons, completeLesson } = useUserProgress();
+  const { xp, streak, completedLessons, completeLesson } = useUserProgress();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
