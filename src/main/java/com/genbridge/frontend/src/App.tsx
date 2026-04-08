@@ -29,6 +29,7 @@ import QuestDetail from "./pages/QuestDetail";
 import Forum from "./pages/Forum";
 import ForumPostDetail from "./pages/ForumPostDetail";
 import Glossary from "./pages/Glossary";
+import Leaderboard from "./pages/Leaderboard";
 const queryClient = new QueryClient();
 
 // Redirects to /login if no token
@@ -156,7 +157,7 @@ const WarningModal = () => {
 // Admin-only route — redirects to /lessons if not admin
 const AdminRoute = () => {
   if (!localStorage.getItem("token")) return <Navigate to="/login" replace />;
-  if (localStorage.getItem("role") !== "ADMIN") return <Navigate to="/lessons" replace />;
+  if (localStorage.getItem("role") !== "ADMIN") return <Navigate to="/home" replace />;
   return <Admin />;
 };
 
@@ -165,7 +166,7 @@ const PublicOnlyRoute = ({ element }: { element: JSX.Element }) => {
   if (!localStorage.getItem("token")) return element;
   return localStorage.getItem("role") === "ADMIN"
     ? <Navigate to="/admin" replace />
-    : <Navigate to="/lessons" replace />;
+    : <Navigate to="/home" replace />;
 };
 
 // Home: dashboard for logged-in users, landing page otherwise
@@ -173,7 +174,7 @@ const HomeRoute = () => {
   if (!localStorage.getItem("token")) return <Index />;
   return localStorage.getItem("role") === "ADMIN"
     ? <Navigate to="/admin" replace />
-    : <Navigate to="/lessons" replace />;
+    : <Navigate to="/home" replace />;
 };
 
 // Intercepts 401 responses anywhere in the app and logs the user out
@@ -217,6 +218,7 @@ const App = () => (
             path="/register"
             element={<PublicOnlyRoute element={<Register />} />}
           />
+          <Route path="/home" element={<PrivateRoute element={<Learn />} />} />
           <Route path="/lessons" element={<PrivateRoute element={<Learn />} />} />
           <Route path="/lessons/:id" element={<PrivateRoute element={<LessonDetail />} />} />
 
@@ -227,6 +229,7 @@ const App = () => (
           <Route path="/forum/:id" element={<PrivateRoute element={<ForumPostDetail />} />} />
           <Route path="/quests" element={<PrivateRoute element={<Quests />} />} />
 <Route path="/quests/:id" element={<PrivateRoute element={<QuestDetail />} />} />
+          <Route path="/leaderboard" element={<PrivateRoute element={<Leaderboard />} />} />
           <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
           <Route path="/settings" element={<PrivateRoute element={<Settings />} />} />
           <Route path="*" element={<NotFound />} />

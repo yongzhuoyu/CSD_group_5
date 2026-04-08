@@ -52,7 +52,7 @@ export default function Admin() {
 
   if (role !== "ADMIN") return <Navigate to="/lessons" replace />;
 
-  const [tab, setTab] = useState<"lessons" | "content" | "quiz" | "reports" | "forum" | "quests" | "users">("lessons");
+  const [tab, setTab] = useState<"lessons" | "content" | "quiz" | "reports" | "forum" | "quests" | "users" | "analytics">("lessons");
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loadingLessons, setLoadingLessons] = useState(true);
 
@@ -509,7 +509,7 @@ export default function Admin() {
       <div className="flex-1 ml-72 pt-12 pb-16 px-8">
         <div className="max-w-5xl mx-auto">
           <h1 className="font-display text-3xl font-bold text-foreground mb-8">
-            {tab === "lessons" ? "Lessons" : tab === "content" ? "Content" : tab === "quiz" ? "Quiz" : tab === "reports" ? "Reports" : tab === "quests" ? "Quests" : tab === "users" ? "Users" : "Forum Moderation"}
+            {tab === "lessons" ? "Lessons" : tab === "content" ? "Content" : tab === "quiz" ? "Quiz" : tab === "reports" ? "Reports" : tab === "quests" ? "Quests" : tab === "users" ? "Users" : tab === "analytics" ? "Analytics" : "Forum Moderation"}
           </h1>
 
           {/* LESSONS TAB */}
@@ -1273,6 +1273,79 @@ export default function Admin() {
           {/* FORUM MODERATION TAB */}
           {tab === "forum" && <ForumModerationTab toast={toast} />}
 
+          {/* ANALYTICS TAB */}
+          {tab === "analytics" && <AnalyticsTab />}
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Analytics Tab ───────────────────────────────────────────────────────────
+
+function AnalyticsTab() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get("/admin/analytics")
+      .then(res => setData(res.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="text-muted-foreground py-20 text-center">Loading...</div>;
+  if (!data) return <div className="text-muted-foreground py-20 text-center">Failed to load analytics.</div>;
+
+  const statCards = [
+    { label: "Total Users",        value: data.totalUsers },
+    { label: "Active Users",       value: data.activeUsers },
+    { label: "Suspended Users",    value: data.suspendedUsers },
+    { label: "Published Lessons",  value: data.publishedLessons },
+    { label: "Quest Completions",  value: data.totalQuestCompletions },
+    { label: "Forum Posts",        value: data.totalForumPosts },
+  ];
+
+  return (
+    <div className="space-y-8">
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {statCards.map(({ label, value }) => (
+          <div key={label} className="rounded-2xl border border-border bg-card p-5">
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest mb-1">{label}</p>
+            <p className="font-display text-4xl font-bold text-foreground">{value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Lesson completion table */}
+      <div>
+        <h2 className="font-semibold text-lg text-foreground mb-3">Lesson Completion Rates</h2>
+        <div className="rounded-2xl border border-border overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Lesson</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Difficulty</th>
+                <th className="text-right px-4 py-3 font-medium text-muted-foreground">Completions</th>
+                <th className="text-right px-4 py-3 font-medium text-muted-foreground">Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.lessonStats.map((ls: any, i: number) => (
+                <tr key={ls.lessonId} className={i % 2 === 0 ? "bg-card" : "bg-muted/20"}>
+                  <td className="px-4 py-3 font-medium text-foreground">{ls.title}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{ls.difficulty}</td>
+                  <td className="px-4 py-3 text-right">{ls.completions}</td>
+                  <td className="px-4 py-3 text-right font-semibold text-primary">{ls.completionRate}%</td>
+                </tr>
+              ))}
+              {data.lessonStats.length === 0 && (
+                <tr><td colSpan={4} className="px-4 py-6 text-center text-muted-foreground">No data yet.</td></tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

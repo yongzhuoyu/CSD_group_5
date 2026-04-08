@@ -32,6 +32,7 @@ public class SecurityConfig {
                 // Public endpoints — no token needed
                 .requestMatchers(HttpMethod.PUT, "/api/auth/change-password").authenticated()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/leaderboard").authenticated()
                 .requestMatchers("/api/health/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html").permitAll()
@@ -54,6 +55,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/progress").authenticated()
 
                 // Admin-only lesson management
+                .requestMatchers(HttpMethod.GET, "/api/admin/analytics").hasRole("ADMIN")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/lessons").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/lessons/{id}").hasRole("ADMIN")
