@@ -172,8 +172,6 @@ const Learn = () => {
     navigate(page === "home" ? "/home" : "/lessons");
   };
 
-  const [sidebarExpanded, setSidebarExpanded] = useState(true);
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
