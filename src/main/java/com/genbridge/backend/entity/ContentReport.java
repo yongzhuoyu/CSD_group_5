@@ -1,5 +1,6 @@
 package com.genbridge.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class ContentReport {
     @Column(name = "lesson_id", nullable = false)
     private Long lessonId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id", insertable = false, updatable = false)
     private Lesson lesson;
@@ -28,6 +30,7 @@ public class ContentReport {
     @Column(name = "reported_by", nullable = false)
     private UUID reportedBy;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_by", insertable = false, updatable = false)
     private com.genbridge.backend.user.User reporter;
