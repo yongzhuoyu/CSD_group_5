@@ -17,21 +17,12 @@ import {
   ArrowLeft,
   Zap,
   Search,
-  Flame,
-  LogOut,
-  Trophy,
   Loader2,
 } from "lucide-react";
-import HomeIcon from "@/assets/icons/home.svg?react";
-import DictionaryIcon from "@/assets/icons/dictionary.svg?react";
-import AccountIcon from "@/assets/icons/account.svg?react";
 import NoteStackIcon from "@/assets/icons/note_stack.svg?react";
 import BarChartIcon from "@/assets/icons/bar_chart.svg?react";
 import EmojiObjectsIcon from "@/assets/icons/emoji_objects.svg?react";
-import ForumIcon from "@/assets/icons/forum.svg?react";
-import KeepIcon from "@/assets/icons/keep.svg?react";
-import SettingsIcon from "@/assets/icons/settings.svg?react";
-import BridgeIcon from "@/assets/icons/bridge.svg?react";
+import AppSidebar from "@/components/AppSidebar";
 import { useUserProgress } from "@/hooks/useUserProgress";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -156,12 +147,10 @@ const Learn = () => {
   const [xpPop, setXpPop] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<"All" | "Beginner" | "Intermediate" | "Advanced">("All");
-  const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [currentPage, setCurrentPage] = useState<"home" | "learn">(
     () => (sessionStorage.getItem("learn_view") as "home" | "learn") ?? "home"
   );
   const [learnedWordsOpen, setLearnedWordsOpen] = useState(false);
-  const [streak] = useState(() => parseInt(localStorage.getItem("gb_streak") ?? "0"));
 
   const changePage = (page: "home" | "learn") => {
     sessionStorage.setItem("learn_view", page);
@@ -267,12 +256,6 @@ const Learn = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    navigate("/login");
-  };
-
   // ── Derived stats ──────────────────────────────────────────────────────────
   const completedCount = lessons.filter(l => progressMap[l.id] === true).length;
   const totalCount = lessons.length;
@@ -309,128 +292,16 @@ const Learn = () => {
     });
   }, [lessons, searchQuery, selectedTag]);
 
-  const sidebarW = sidebarExpanded ? "w-72" : "w-16";
-  const contentML = sidebarExpanded ? "ml-72" : "ml-16";
-
-  // ── Sidebar ────────────────────────────────────────────────────────────────
-  const sidebar = (
-    <aside
-      className={`fixed top-0 left-0 h-full z-40 bg-card border-r border-border flex flex-col transition-all duration-300 ${sidebarW}`}
-    >
-      {sidebarExpanded ? (
-        <div className="flex items-center h-16 px-4 border-b border-border shrink-0 gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-            <BridgeIcon className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <span className="font-sidebar text-xl font-bold text-foreground whitespace-nowrap flex-1">
-            GenBridge
-          </span>
-          <button
-            onClick={() => setSidebarExpanded(false)}
-            title="Unpin sidebar"
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-primary hover:bg-primary/10 transition-colors"
-          >
-            <KeepIcon className="w-4 h-4" />
-          </button>
-        </div>
-      ) : (
-        <button
-          onClick={() => setSidebarExpanded(true)}
-          title="Pin sidebar"
-          className="flex items-center justify-center h-16 w-full border-b border-border shrink-0 hover:bg-muted transition-colors"
-        >
-          <KeepIcon className="w-4 h-4 text-muted-foreground" />
-        </button>
-      )}
-
-      <nav className="flex-1 p-3 space-y-1 overflow-hidden">
-        {([
-          { icon: HomeIcon,       label: "Home",  page: "home"  as const },
-          { icon: DictionaryIcon, label: "Learn", page: "learn" as const },
-        ]).map(({ icon: Icon, label, page }) => {
-          const isActive = currentPage === page && !selectedLesson;
-          return (
-            <button
-              key={label}
-              onClick={() => { changePage(page); setSelectedLesson(null); setLessonContent([]); setLessonQuiz([]); setShowQuiz(false); }}
-              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors ${
-                isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              } ${!sidebarExpanded ? "justify-center" : ""}`}
-            >
-              <Icon className="w-6 h-6 shrink-0" />
-              {sidebarExpanded && <span className="whitespace-nowrap">{label}</span>}
-            </button>
-          );
-        })}
-        <Link
-          to="/forum"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <ForumIcon className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span className="whitespace-nowrap">Forum</span>}
-        </Link>
-        <Link
-          to="/quests"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <Trophy className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span className="whitespace-nowrap">Quests</span>}
-        </Link>
-        <Link
-          to="/profile"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <AccountIcon className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span className="whitespace-nowrap">Profile</span>}
-        </Link>
-        <Link
-          to="/settings"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <SettingsIcon className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span className="whitespace-nowrap">Settings</span>}
-        </Link>
-      </nav>
-
-      <div className="p-3 border-t border-border space-y-1 shrink-0">
-        {sidebarExpanded ? (
-          <div className="flex items-center gap-2 px-3 py-1.5">
-            {streak > 0 && (
-              <span className="flex items-center gap-1 text-orange-500 text-xs font-bold">
-                <Flame className="w-4 h-4" />{streak}
-              </span>
-            )}
-            <span className="flex items-center gap-1 text-primary text-xs font-bold ml-auto">
-              <Star className="w-4 h-4" />{xp} XP
-            </span>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-2 py-1">
-            {streak > 0 && <Flame className="w-5 h-5 text-orange-500" />}
-            <Star className="w-5 h-5 text-primary" />
-          </div>
-        )}
-        <button
-          onClick={handleLogout}
-          className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <LogOut className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span>Log out</span>}
-        </button>
-      </div>
-    </aside>
-  );
-
   // ── Quiz view ──────────────────────────────────────────────────────────────
   if (selectedLesson && showQuiz) {
     const allAnswered = lessonQuiz.length > 0 && lessonQuiz.every((q) => quizAnswers[q.id] !== undefined);
     return (
       <div className="flex min-h-screen bg-background">
-        {sidebar}
+        <AppSidebar activePage="learn" />
         <AnimatePresence>
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
         </AnimatePresence>
-        <div className={`flex-1 transition-all duration-300 ${contentML}`}>
+        <div className={`flex-1 transition-all duration-300 ml-72`}>
           <div className="py-12 px-8 max-w-2xl mx-auto">
             <button
               onClick={() => setShowQuiz(false)}
@@ -545,11 +416,11 @@ const Learn = () => {
     const isComplete = progressMap[selectedLesson.id] === true;
     return (
       <div className="flex min-h-screen bg-background">
-        {sidebar}
+        <AppSidebar activePage="learn" />
         <AnimatePresence>
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
         </AnimatePresence>
-        <div className={`flex-1 transition-all duration-300 ${contentML}`}>
+        <div className={`flex-1 transition-all duration-300 ml-72`}>
           <div className="py-12 px-8 max-w-3xl mx-auto">
             <button
               onClick={() => { setSelectedLesson(null); setLessonContent([]); setLessonQuiz([]); }}
@@ -648,8 +519,8 @@ const Learn = () => {
     const spotlightLesson = nextLesson ?? lessons[Math.floor(Math.random() * lessons.length)];
     return (
       <div className="flex h-screen overflow-hidden bg-background">
-        {sidebar}
-        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-10`}>
+        <AppSidebar activePage="learn" />
+        <main className={`flex-1 overflow-y-auto transition-all duration-300 ml-72 py-10 px-10`}>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
 
             <div className="flex items-center justify-between mb-8">
@@ -846,7 +717,7 @@ const Learn = () => {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {sidebar}
-      <div className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-8`}>
+      <div className={`flex-1 overflow-y-auto transition-all duration-300 ml-72 py-10 px-8`}>
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
 
           <div className="mb-6">
