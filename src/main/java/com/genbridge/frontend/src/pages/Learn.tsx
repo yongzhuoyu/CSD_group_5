@@ -18,10 +18,20 @@ import {
   Zap,
   Search,
   Loader2,
+  Flame,
+  LogOut,
+  Trophy,
 } from "lucide-react";
 import NoteStackIcon from "@/assets/icons/note_stack.svg?react";
 import BarChartIcon from "@/assets/icons/bar_chart.svg?react";
 import EmojiObjectsIcon from "@/assets/icons/emoji_objects.svg?react";
+import BridgeIcon from "@/assets/icons/bridge.svg?react";
+import ForumIcon from "@/assets/icons/forum.svg?react";
+import HomeIcon from "@/assets/icons/home.svg?react";
+import DictionaryIcon from "@/assets/icons/dictionary.svg?react";
+import AccountIcon from "@/assets/icons/account.svg?react";
+import KeepIcon from "@/assets/icons/keep.svg?react";
+import SettingsIcon from "@/assets/icons/settings.svg?react";
 import AppSidebar from "@/components/AppSidebar";
 import { useUserProgress } from "@/hooks/useUserProgress";
 
@@ -155,6 +165,14 @@ const Learn = () => {
   const changePage = (page: "home" | "learn") => {
     sessionStorage.setItem("learn_view", page);
     setCurrentPage(page);
+  };
+
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/login");
   };
 
   // Keep a ref so popstate handler always sees the latest selectedLesson
@@ -291,6 +309,121 @@ const Learn = () => {
       return matchesSearch && matchesTag;
     });
   }, [lessons, searchQuery, selectedTag]);
+
+  // ── Inline sidebar (preserves Home/Learn tab switching) ───────────────────
+  const sidebarW = sidebarExpanded ? "w-72" : "w-16";
+  const contentML = sidebarExpanded ? "ml-72" : "ml-16";
+
+  const sidebar = (
+    <aside className={`fixed top-0 left-0 h-full z-40 bg-card border-r border-border flex flex-col transition-all duration-300 ${sidebarW}`}>
+      {sidebarExpanded ? (
+        <div className="flex items-center h-16 px-4 border-b border-border shrink-0 gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+            <BridgeIcon className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <span className="font-sidebar text-xl font-bold text-foreground whitespace-nowrap flex-1">GenBridge</span>
+          <button
+            onClick={() => setSidebarExpanded(false)}
+            title="Collapse sidebar"
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-primary hover:bg-primary/10 transition-colors"
+          >
+            <KeepIcon className="w-4 h-4" />
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => setSidebarExpanded(true)}
+          title="Expand sidebar"
+          className="flex items-center justify-center h-16 w-full border-b border-border shrink-0 hover:bg-muted transition-colors"
+        >
+          <KeepIcon className="w-4 h-4 text-muted-foreground" />
+        </button>
+      )}
+
+      <nav className="flex-1 p-3 space-y-1 overflow-hidden">
+        <button
+          onClick={() => changePage("home")}
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors w-full text-left ${
+            currentPage === "home" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+          } ${!sidebarExpanded ? "justify-center" : ""}`}
+        >
+          <HomeIcon className="w-6 h-6 shrink-0" />
+          {sidebarExpanded && <span className="whitespace-nowrap">Home</span>}
+        </button>
+        <button
+          onClick={() => changePage("learn")}
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors w-full text-left ${
+            currentPage === "learn" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+          } ${!sidebarExpanded ? "justify-center" : ""}`}
+        >
+          <DictionaryIcon className="w-6 h-6 shrink-0" />
+          {sidebarExpanded && <span className="whitespace-nowrap">Learn</span>}
+        </button>
+        <Link
+          to="/glossary"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
+        >
+          <BookOpen className="w-6 h-6 shrink-0" />
+          {sidebarExpanded && <span className="whitespace-nowrap">Glossary</span>}
+        </Link>
+        <Link
+          to="/forum"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
+        >
+          <ForumIcon className="w-6 h-6 shrink-0" />
+          {sidebarExpanded && <span className="whitespace-nowrap">Forum</span>}
+        </Link>
+        <Link
+          to="/quests"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
+        >
+          <Trophy className="w-6 h-6 shrink-0" />
+          {sidebarExpanded && <span className="whitespace-nowrap">Quests</span>}
+        </Link>
+        <Link
+          to="/profile"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
+        >
+          <AccountIcon className="w-6 h-6 shrink-0" />
+          {sidebarExpanded && <span className="whitespace-nowrap">Profile</span>}
+        </Link>
+        <Link
+          to="/settings"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
+        >
+          <SettingsIcon className="w-6 h-6 shrink-0" />
+          {sidebarExpanded && <span className="whitespace-nowrap">Settings</span>}
+        </Link>
+      </nav>
+
+      <div className="p-3 border-t border-border space-y-1 shrink-0">
+        {sidebarExpanded ? (
+          <div className="flex items-center gap-2 px-3 py-1.5">
+            {streak > 0 && (
+              <span className="flex items-center gap-1 text-orange-500 text-xs font-bold">
+                <Flame className="w-4 h-4" />{streak}
+              </span>
+            )}
+            <span className="flex items-center gap-1 text-primary text-xs font-bold ml-auto">
+              <Star className="w-4 h-4" />{xp} XP
+            </span>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2 py-1">
+            {streak > 0 && <Flame className="w-5 h-5 text-orange-500" />}
+            <Star className="w-5 h-5 text-primary" />
+          </div>
+        )}
+        <button
+          onClick={handleLogout}
+          className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors ${!sidebarExpanded ? "justify-center" : ""}`}
+        >
+          <LogOut className="w-6 h-6 shrink-0" />
+          {sidebarExpanded && <span>Log out</span>}
+        </button>
+      </div>
+    </aside>
+  );
 
   // ── Quiz view ──────────────────────────────────────────────────────────────
   if (selectedLesson && showQuiz) {
@@ -519,8 +652,8 @@ const Learn = () => {
     const spotlightLesson = nextLesson ?? lessons[Math.floor(Math.random() * lessons.length)];
     return (
       <div className="flex h-screen overflow-hidden bg-background">
-        <AppSidebar activePage="learn" />
-        <main className={`flex-1 overflow-y-auto transition-all duration-300 ml-72 py-10 px-10`}>
+        {sidebar}
+        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-10`}>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
 
             <div className="flex items-center justify-between mb-8">
@@ -717,7 +850,7 @@ const Learn = () => {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {sidebar}
-      <div className={`flex-1 overflow-y-auto transition-all duration-300 ml-72 py-10 px-8`}>
+      <div className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-8`}>
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
 
           <div className="mb-6">
