@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/lessons/{id}/quiz").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/start").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/lessons/{id}/quiz/submit").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/content/glossary").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/content/lesson/{lessonId}").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/progress").authenticated()
 

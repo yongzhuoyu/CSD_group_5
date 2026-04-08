@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { LogOut, Flag, MessageCircle } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { LogOut, Flag, MessageCircle, BookOpen } from "lucide-react";
 import BridgeIcon from "@/assets/icons/bridge.svg?react";
 import DictionaryIcon from "@/assets/icons/dictionary.svg?react";
 import NoteStackIcon from "@/assets/icons/note_stack.svg?react";
@@ -84,7 +84,14 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
       </nav>
 
       {/* Bottom */}
-      <div className="p-3 border-t border-border shrink-0">
+      <div className="p-3 border-t border-border shrink-0 space-y-1">
+        <Link
+          to="/glossary"
+          className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors ${!expanded ? "justify-center" : ""}`}
+        >
+          <BookOpen className="w-6 h-6 shrink-0" />
+          {expanded && <span>Glossary</span>}
+        </Link>
         <button
           onClick={handleLogout}
           className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors ${!expanded ? "justify-center" : ""}`}

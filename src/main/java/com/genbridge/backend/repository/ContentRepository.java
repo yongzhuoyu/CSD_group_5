@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ContentRepository extends JpaRepository<Content, Long> {
     List<Content> findByLessonIdOrderByOrderIndex(Long lessonId);
+    List<Content> findAllByOrderByTermAsc();
 }

@@ -20,6 +20,12 @@ public class ContentController {
         this.contentService = contentService;
     }
 
+    // LEARNER: Get all content terms (glossary)
+    @GetMapping("/glossary")
+    public ResponseEntity<List<Content>> getAllContent() {
+        return ResponseEntity.ok(contentService.getAllContent());
+    }
+
     // LEARNER: Get all content terms for a lesson
     @GetMapping("/lesson/{lessonId}")
     public ResponseEntity<List<Content>> getContentByLesson(@PathVariable Long lessonId) {

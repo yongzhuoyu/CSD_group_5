@@ -23,6 +23,10 @@ public class ContentService {
         return contentRepository.findByLessonIdOrderByOrderIndex(lessonId);
     }
 
+    public List<Content> getAllContent() {
+        return contentRepository.findAllByOrderByTermAsc();
+    }
+
     public Content createContent(ContentRequest request) {
         Content content = new Content();
         content.setLessonId(request.getLessonId());

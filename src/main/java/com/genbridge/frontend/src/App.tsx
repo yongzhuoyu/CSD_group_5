@@ -24,6 +24,7 @@ import Quests from "./pages/Quests";
 import QuestDetail from "./pages/QuestDetail";
 import Forum from "./pages/Forum";
 import ForumPostDetail from "./pages/ForumPostDetail";
+import Glossary from "./pages/Glossary";
 const queryClient = new QueryClient();
 
 // Redirects to /login if no token
@@ -104,6 +105,7 @@ const App = () => (
             }
           />
 
+          <Route path="/glossary" element={<PrivateRoute element={<Glossary />} />} />
           <Route path="/forum" element={<PrivateRoute element={<Forum />} />} />
           <Route path="/forum/:id" element={<PrivateRoute element={<ForumPostDetail />} />} />
           <Route path="/quests" element={<PrivateRoute element={<Quests />} />} />
