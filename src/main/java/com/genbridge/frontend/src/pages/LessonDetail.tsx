@@ -92,7 +92,7 @@ const LessonDetail = () => {
       setLoading(true);
       try {
         // Start progress tracking (non-blocking)
-        api.post(`/lessons/${lessonId}/start`).catch(() => {});
+        api.post(`/lessons/${lessonId}/progress`).catch(() => {});
 
         const [lessonRes, contentRes, quizRes, progressRes] = await Promise.all([
           api.get(`/lessons/${lessonId}`),
@@ -123,7 +123,7 @@ const LessonDetail = () => {
     if (!lesson) return;
     setSubmittingQuiz(true);
     try {
-      const res = await api.post(`/lessons/${lesson.id}/quiz/submit`, { answers });
+      const res = await api.post(`/lessons/${lesson.id}/quiz/attempts`, { answers });
       setQuizResult(res.data);
       if (res.data.completed) {
         setIsCompleted(true);

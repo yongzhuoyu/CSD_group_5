@@ -11,6 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import com.genbridge.backend.auth.dto.ChangePasswordRequest;
 
+/**
+ * Service for user registration, authentication, password changes, and streak management.
+ * Streak logic: increments on consecutive days, resets after a gap, no-ops when already active today.
+ */
 @Service
 public class UserService {
 

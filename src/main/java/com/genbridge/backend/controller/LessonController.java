@@ -7,9 +7,14 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 import java.util.List;
 
+/**
+ * REST controller for lesson management.
+ * Public GET endpoints return only published lessons; admin endpoints support full CRUD and publish toggling.
+ */
 @RestController
 public class LessonController {
 
@@ -51,7 +56,7 @@ public class LessonController {
     }
 
     // ADMIN: Toggle publish/unpublish a lesson
-    @PutMapping("/api/lessons/{id}/publish")
+    @PatchMapping("/api/lessons/{id}/published")
     public ResponseEntity<Lesson> togglePublish(@PathVariable Long id) {
         return ResponseEntity.ok(lessonService.togglePublish(id));
     }

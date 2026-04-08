@@ -2,6 +2,9 @@ package com.genbridge.backend.entity;
 
 import com.genbridge.backend.user.User;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,6 +14,9 @@ import java.time.LocalDateTime;
         @UniqueConstraint(columnNames = {"quest_id", "user_id"})
     }
 )
+@Getter
+@Setter
+@NoArgsConstructor
 public class QuestCompletion {
 
     @Id
@@ -30,39 +36,4 @@ public class QuestCompletion {
 
     @Column(name = "completed_at", nullable = false)
     private LocalDateTime completedAt = LocalDateTime.now();
-
-    public QuestCompletion() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Quest getQuest() {
-        return quest;
-    }
-
-    public void setQuest(Quest quest) {
-        this.quest = quest;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getReflection() {
-        return reflection;
-    }
-
-    public void setReflection(String reflection) {
-        this.reflection = reflection;
-    }
-
-    public LocalDateTime getCompletedAt() {
-        return completedAt;
-    }
 }

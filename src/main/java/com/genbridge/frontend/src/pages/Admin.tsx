@@ -217,7 +217,7 @@ export default function Admin() {
 
   const resolveReport = async (reportId: number) => {
     try {
-      await api.put(`/admin/reports/${reportId}/resolve`);
+      await api.patch(`/admin/reports/${reportId}`);
       toast({ title: "Report resolved" });
       loadReports();
     } catch {
@@ -496,7 +496,7 @@ export default function Admin() {
   };
 
   const togglePublish = async (id: number) => {
-    await api.put(`/lessons/${id}/publish`);
+    await api.patch(`/lessons/${id}/published`);
     toast({ title: "Publish status updated" });
     loadLessons();
   };

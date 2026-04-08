@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * REST controller for quiz questions and attempts.
+ * Learners fetch questions and submit attempts; admins manage question CRUD.
+ * All endpoints are scoped under /api/lessons/{id}/quiz.
+ */
 @RestController
 @RequestMapping("/api/lessons/{id}/quiz")
 public class QuizController {
@@ -37,7 +42,7 @@ public class QuizController {
         return ResponseEntity.status(HttpStatus.CREATED).body(quizService.createQuizQuestion(lessonId, request));
     }
 
-    @PostMapping("/submit")
+    @PostMapping("/attempts")
     public ResponseEntity<Map<String, Object>> submitQuiz(@PathVariable("id") Long lessonId,
                                                           @Valid @RequestBody SubmitQuizRequest request,
                                                           Authentication authentication) {

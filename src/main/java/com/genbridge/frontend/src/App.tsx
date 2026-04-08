@@ -119,7 +119,7 @@ const WarningModal = () => {
   }, []);
 
   const dismiss = async () => {
-    try { await api.post("/me/warnings/read"); } catch {}
+    try { await api.patch("/me/warnings"); } catch {}
     setWarnings([]);
   };
 

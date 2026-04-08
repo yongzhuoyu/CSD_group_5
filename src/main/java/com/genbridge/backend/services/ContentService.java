@@ -9,6 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Service for managing content terms (slang entries) attached to lessons.
+ * Supports per-lesson retrieval, a global glossary view, and full CRUD for admins.
+ */
 @Service
 @Transactional
 public class ContentService {
@@ -19,10 +23,12 @@ public class ContentService {
         this.contentRepository = contentRepository;
     }
 
+    /** Returns all content terms for the given lesson, ordered by their display index. */
     public List<Content> getContentByLesson(Long lessonId) {
         return contentRepository.findByLessonIdOrderByOrderIndex(lessonId);
     }
 
+    /** Returns every content term across all lessons, sorted alphabetically — used by the Glossary page. */
     public List<Content> getAllContent() {
         return contentRepository.findAllByOrderByTermAsc();
     }

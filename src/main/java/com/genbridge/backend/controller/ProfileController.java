@@ -17,6 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller for the learner's profile page.
+ * Returns a combined view of the user's personal info, XP, streak,
+ * completed lessons, and completed quests.
+ */
 @RestController
 @RequestMapping("/api")
 public class ProfileController {

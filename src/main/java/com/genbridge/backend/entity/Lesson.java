@@ -1,10 +1,16 @@
 package com.genbridge.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "lessons")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Lesson {
 
     @Id
@@ -37,25 +43,4 @@ public class Lesson {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
-
-    public Lesson() {}
-
-    public Long getId() { return id; }
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public String getDifficulty() { return difficulty; }
-    public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
-    public String getObjective() { return objective; }
-    public void setObjective(String objective) { this.objective = objective; }
-    public boolean isPublished() { return published; }
-    public void setPublished(boolean published) { this.published = published; }
-    public LocalDateTime getPublishedAt() { return publishedAt; }
-    public void setPublishedAt(LocalDateTime publishedAt) { this.publishedAt = publishedAt; }
-    public String getCreatedBy() { return createdBy; }
-    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * REST controller for lesson progress tracking.
+ * POST to /progress creates or updates a learner's progress record for a lesson.
+ * GET to /progress returns a summary of all completed lessons for the authenticated user.
+ */
 @RestController
 public class ProgressController {
 
@@ -22,7 +27,7 @@ public class ProgressController {
         this.progressService = progressService;
     }
 
-    @PostMapping("/api/lessons/{id}/start")
+    @PostMapping("/api/lessons/{id}/progress")
     public ResponseEntity<LessonProgress> startLesson(@PathVariable("id") Long lessonId,
                                                       Authentication authentication) {
         User user = (User) authentication.getPrincipal();

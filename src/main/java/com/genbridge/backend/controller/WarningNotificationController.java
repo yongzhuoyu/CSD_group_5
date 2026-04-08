@@ -7,12 +7,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller for in-app warning notifications.
+ * Learners fetch unread warnings and PATCH to mark them all as read.
+ */
 @RestController
 @RequestMapping("/api/me/warnings")
 public class WarningNotificationController {
@@ -39,9 +44,9 @@ public class WarningNotificationController {
         return ResponseEntity.ok(warnings);
     }
 
-    // POST /api/me/warnings/read — mark all as read
+    // PATCH /api/me/warnings — mark all warnings as read
     @Transactional
-    @PostMapping("/read")
+    @PatchMapping
     public ResponseEntity<Void> markWarningsRead(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         List<UserWarning> unread = warningRepository.findByUserIdAndIsReadFalse(user.getId());

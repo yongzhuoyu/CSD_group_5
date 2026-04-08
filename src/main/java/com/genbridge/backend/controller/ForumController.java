@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * REST controller for the community forum.
+ * Authenticated learners can create posts and add comments; admins can delete posts or comments.
+ */
 @RestController
 @RequestMapping("/api/forum")
 public class ForumController {

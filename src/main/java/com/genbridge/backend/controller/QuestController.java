@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * REST controller for quests and quest completions.
+ * Learners view published quests and POST to /completions to submit; admins perform full CRUD.
+ */
 @RestController
 public class QuestController {
 
@@ -32,7 +36,7 @@ public class QuestController {
         return ResponseEntity.ok(questService.getPublishedQuestByIdForCurrentUser(id));
     }
 
-    @PostMapping("/api/quests/{id}/complete")
+    @PostMapping("/api/quests/{id}/completions")
     public ResponseEntity<Map<String, Object>> completeQuest(
             @PathVariable Long id,
             @Valid @RequestBody QuestCompletionRequest request

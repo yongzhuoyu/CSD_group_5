@@ -17,6 +17,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service for managing quests and quest completions.
+ * Learners can view published quests and submit completions with a reflection;
+ * admins can create, update, and delete quests.
+ */
 @Service
 @Transactional
 public class QuestService {

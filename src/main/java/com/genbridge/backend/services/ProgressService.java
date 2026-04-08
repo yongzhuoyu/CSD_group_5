@@ -12,6 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Service for tracking lesson progress per user.
+ * Records when a learner starts a lesson and aggregates overall completion stats.
+ */
 @Service
 @Transactional
 public class ProgressService {

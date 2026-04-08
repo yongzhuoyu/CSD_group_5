@@ -9,9 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 import java.util.List;
 
+/**
+ * REST controller for learner-submitted content error reports.
+ * Learners submit reports; admins view all reports and mark them resolved via PATCH.
+ */
 @RestController
 public class ContentReportController {
 
@@ -37,8 +42,8 @@ public class ContentReportController {
         return ResponseEntity.ok(contentReportService.getAllReports());
     }
 
-    // ADMIN: Resolve a report
-    @PutMapping("/api/admin/reports/{reportId}/resolve")
+    // ADMIN: Resolve a report — PATCH to update its status to RESOLVED
+    @PatchMapping("/api/admin/reports/{reportId}")
     public ResponseEntity<ContentReport> resolveReport(@PathVariable Long reportId) {
         return ResponseEntity.ok(contentReportService.resolveReport(reportId));
     }

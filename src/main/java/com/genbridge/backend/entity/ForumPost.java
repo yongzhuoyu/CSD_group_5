@@ -1,11 +1,17 @@
 package com.genbridge.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "forum_posts")
+@Getter
+@Setter
+@NoArgsConstructor
 public class ForumPost {
 
     @Id
@@ -29,19 +35,4 @@ public class ForumPost {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
-
-    public ForumPost() {}
-
-    public Long getId() { return id; }
-    public UUID getUserId() { return userId; }
-    public void setUserId(UUID userId) { this.userId = userId; }
-    public String getUserName() { return userName; }
-    public void setUserName(String userName) { this.userName = userName; }
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-    public String getBody() { return body; }
-    public void setBody(String body) { this.body = body; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

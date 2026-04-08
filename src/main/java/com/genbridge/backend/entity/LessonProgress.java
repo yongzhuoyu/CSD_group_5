@@ -1,13 +1,9 @@
 package com.genbridge.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -15,6 +11,9 @@ import java.util.UUID;
 @Table(name = "lesson_progress", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "lesson_id"})
 })
+@Getter
+@Setter
+@NoArgsConstructor
 public class LessonProgress {
 
     @Id
@@ -35,51 +34,4 @@ public class LessonProgress {
 
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
-
-    public LessonProgress() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
-
-    public Long getLessonId() {
-        return lessonId;
-    }
-
-    public void setLessonId(Long lessonId) {
-        this.lessonId = lessonId;
-    }
-
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
-
-    public LocalDateTime getStartedAt() {
-        return startedAt;
-    }
-
-    public void setStartedAt(LocalDateTime startedAt) {
-        this.startedAt = startedAt;
-    }
-
-    public LocalDateTime getCompletedAt() {
-        return completedAt;
-    }
-
-    public void setCompletedAt(LocalDateTime completedAt) {
-        this.completedAt = completedAt;
-    }
 }
