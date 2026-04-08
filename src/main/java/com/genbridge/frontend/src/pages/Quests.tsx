@@ -33,7 +33,7 @@ export default function Quests() {
   return (
     <div className="flex min-h-screen bg-background">
       <AppSidebar activePage="quests" />
-      <div className="flex-1 ml-72 pt-12 pb-16 px-8">
+      <div className="flex-1 ml-0 md:ml-16 lg:ml-72 pt-16 md:pt-12 pb-16 px-4 md:px-8">
         <div className="max-w-5xl mx-auto">
           <div className="mb-8">
             <h1 className="font-display text-3xl font-bold text-foreground mb-2">Quests</h1>

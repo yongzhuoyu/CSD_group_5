@@ -21,6 +21,8 @@ import {
   Flame,
   LogOut,
   Trophy,
+  Menu,
+  X,
 } from "lucide-react";
 import NoteStackIcon from "@/assets/icons/note_stack.svg?react";
 import BarChartIcon from "@/assets/icons/bar_chart.svg?react";
@@ -30,7 +32,6 @@ import ForumIcon from "@/assets/icons/forum.svg?react";
 import HomeIcon from "@/assets/icons/home.svg?react";
 import DictionaryIcon from "@/assets/icons/dictionary.svg?react";
 import AccountIcon from "@/assets/icons/account.svg?react";
-import KeepIcon from "@/assets/icons/keep.svg?react";
 import SettingsIcon from "@/assets/icons/settings.svg?react";
 import AppSidebar from "@/components/AppSidebar";
 import { useUserProgress } from "@/hooks/useUserProgress";
@@ -164,7 +165,7 @@ const Learn = () => {
   const [xpPop, setXpPop] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<"All" | "Beginner" | "Intermediate" | "Advanced">("All");
-  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const currentPage: "home" | "learn" = location.pathname === "/lessons" ? "learn" : "home";
   const [learnedWordsOpen, setLearnedWordsOpen] = useState(false);
 
@@ -313,120 +314,110 @@ const Learn = () => {
     });
   }, [lessons, searchQuery, selectedTag]);
 
-  // ── Inline sidebar (preserves Home/Learn tab switching) ───────────────────
-  const sidebarW = sidebarExpanded ? "w-72" : "w-16";
-  const contentML = sidebarExpanded ? "ml-72" : "ml-16";
+  // ── Inline responsive sidebar (preserves Home/Learn tab switching) ──────────
+  const contentML = "ml-0 md:ml-16 lg:ml-72";
+
+  const closeSidebar = () => setMobileSidebarOpen(false);
 
   const sidebar = (
-    <aside className={`fixed top-0 left-0 h-full z-40 bg-card border-r border-border flex flex-col transition-all duration-300 ${sidebarW}`}>
-      {sidebarExpanded ? (
+    <>
+      {/* Hamburger — mobile only */}
+      <button
+        onClick={() => setMobileSidebarOpen(true)}
+        className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors shadow-sm"
+        aria-label="Open menu"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+
+      {/* Backdrop — mobile only */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={closeSidebar} />
+      )}
+
+      <aside
+        className={[
+          "fixed top-0 left-0 h-full bg-card border-r border-border flex flex-col transition-all duration-300",
+          "w-72 md:w-16 lg:w-72",
+          "z-50 md:z-40",
+          mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+        ].join(" ")}
+      >
+        {/* Header */}
         <div className="flex items-center h-16 px-4 border-b border-border shrink-0 gap-3">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <BridgeIcon className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="font-sidebar text-xl font-bold text-foreground whitespace-nowrap flex-1">GenBridge</span>
-          <button
-            onClick={() => setSidebarExpanded(false)}
-            title="Collapse sidebar"
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-primary hover:bg-primary/10 transition-colors"
-          >
-            <KeepIcon className="w-4 h-4" />
+          <span className="font-sidebar text-xl font-bold text-foreground whitespace-nowrap flex-1 md:hidden lg:block">GenBridge</span>
+          <button onClick={closeSidebar} className="md:hidden p-1 rounded-lg hover:bg-muted transition-colors" aria-label="Close menu">
+            <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
-      ) : (
-        <button
-          onClick={() => setSidebarExpanded(true)}
-          title="Expand sidebar"
-          className="flex items-center justify-center h-16 w-full border-b border-border shrink-0 hover:bg-muted transition-colors"
-        >
-          <KeepIcon className="w-4 h-4 text-muted-foreground" />
-        </button>
-      )}
 
-      <nav className="flex-1 p-3 space-y-1 overflow-hidden">
-        {([
-          { icon: HomeIcon,       label: "Home",  href: "/home"    },
-          { icon: DictionaryIcon, label: "Learn", href: "/lessons" },
-        ]).map(({ icon: Icon, label, href }) => {
-          const isActive = location.pathname === href && !selectedLesson;
-          return (
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto overflow-x-hidden">
+          {([
+            { icon: HomeIcon,       label: "Home",  href: "/home"    },
+            { icon: DictionaryIcon, label: "Learn", href: "/lessons" },
+          ]).map(({ icon: Icon, label, href }) => {
+            const isActive = location.pathname === href;
+            return (
+              <Link
+                key={label}
+                to={href}
+                onClick={() => { setSelectedLesson(null); setLessonContent([]); setLessonQuiz([]); setShowQuiz(false); closeSidebar(); }}
+                className={[
+                  "flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors",
+                  "justify-start md:justify-center lg:justify-start",
+                  isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                ].join(" ")}
+              >
+                <Icon className="w-6 h-6 shrink-0" />
+                <span className="whitespace-nowrap md:hidden lg:block">{label}</span>
+              </Link>
+            );
+          })}
+          {([
+            { icon: BookOpen,     label: "Glossary", href: "/glossary" },
+            { icon: ForumIcon,    label: "Forum",    href: "/forum"    },
+            { icon: Trophy,       label: "Quests",   href: "/quests"   },
+            { icon: AccountIcon,  label: "Profile",  href: "/profile"  },
+            { icon: SettingsIcon, label: "Settings", href: "/settings" },
+          ]).map(({ icon: Icon, label, href }) => (
             <Link
               key={label}
               to={href}
-              onClick={() => { setSelectedLesson(null); setLessonContent([]); setLessonQuiz([]); setShowQuiz(false); }}
-              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors ${
-                isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              } ${!sidebarExpanded ? "justify-center" : ""}`}
+              onClick={closeSidebar}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground justify-start md:justify-center lg:justify-start"
             >
               <Icon className="w-6 h-6 shrink-0" />
-              {sidebarExpanded && <span className="whitespace-nowrap">{label}</span>}
+              <span className="whitespace-nowrap md:hidden lg:block">{label}</span>
             </Link>
-          );
-        })}
-        <Link
-          to="/glossary"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <BookOpen className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span className="whitespace-nowrap">Glossary</span>}
-        </Link>
-        <Link
-          to="/forum"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <ForumIcon className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span className="whitespace-nowrap">Forum</span>}
-        </Link>
-        <Link
-          to="/quests"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <Trophy className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span className="whitespace-nowrap">Quests</span>}
-        </Link>
-        <Link
-          to="/profile"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <AccountIcon className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span className="whitespace-nowrap">Profile</span>}
-        </Link>
-        <Link
-          to="/settings"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <SettingsIcon className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span className="whitespace-nowrap">Settings</span>}
-        </Link>
-      </nav>
+          ))}
+        </nav>
 
-      <div className="p-3 border-t border-border space-y-1 shrink-0">
-        {sidebarExpanded ? (
-          <div className="flex items-center gap-2 px-3 py-1.5">
+        <div className="p-3 border-t border-border space-y-1 shrink-0">
+          <div className="flex items-center gap-2 px-3 py-1.5 md:flex-col md:gap-1 lg:flex-row lg:gap-2">
             {streak > 0 && (
               <span className="flex items-center gap-1 text-orange-500 text-xs font-bold">
-                <Flame className="w-4 h-4" />{streak}
+                <Flame className="w-4 h-4 shrink-0" />
+                <span className="md:hidden lg:block">{streak}</span>
               </span>
             )}
-            <span className="flex items-center gap-1 text-primary text-xs font-bold ml-auto">
-              <Star className="w-4 h-4" />{xp} XP
+            <span className="flex items-center gap-1 text-primary text-xs font-bold md:ml-0 lg:ml-auto">
+              <Star className="w-4 h-4 shrink-0" />
+              <span className="md:hidden lg:block">{xp} XP</span>
             </span>
           </div>
-        ) : (
-          <div className="flex flex-col items-center gap-2 py-1">
-            {streak > 0 && <Flame className="w-5 h-5 text-orange-500" />}
-            <Star className="w-5 h-5 text-primary" />
-          </div>
-        )}
-        <button
-          onClick={handleLogout}
-          className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <LogOut className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span>Log out</span>}
-        </button>
-      </div>
-    </aside>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors justify-start md:justify-center lg:justify-start"
+          >
+            <LogOut className="w-6 h-6 shrink-0" />
+            <span className="md:hidden lg:block">Log out</span>
+          </button>
+        </div>
+      </aside>
+    </>
   );
 
   // ── Quiz view ──────────────────────────────────────────────────────────────
@@ -438,8 +429,8 @@ const Learn = () => {
         <AnimatePresence>
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
         </AnimatePresence>
-        <div className={`flex-1 transition-all duration-300 ml-72`}>
-          <div className="py-12 px-8 max-w-2xl mx-auto">
+        <div className={`flex-1 transition-all duration-300 ml-0 md:ml-16 lg:ml-72`}>
+          <div className="py-16 md:py-12 px-4 md:px-8 max-w-2xl mx-auto">
             <button
               onClick={() => setShowQuiz(false)}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
@@ -557,8 +548,8 @@ const Learn = () => {
         <AnimatePresence>
           {xpPop !== null && <XPCelebration xp={xpPop} onClose={() => setXpPop(null)} />}
         </AnimatePresence>
-        <div className={`flex-1 transition-all duration-300 ml-72`}>
-          <div className="py-12 px-8 max-w-3xl mx-auto">
+        <div className={`flex-1 transition-all duration-300 ml-0 md:ml-16 lg:ml-72`}>
+          <div className="py-16 md:py-12 px-4 md:px-8 max-w-3xl mx-auto">
             <button
               onClick={() => { setSelectedLesson(null); setLessonContent([]); setLessonQuiz([]); }}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
@@ -657,7 +648,7 @@ const Learn = () => {
     return (
       <div className="flex h-screen overflow-hidden bg-background">
         {sidebar}
-        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-10`}>
+        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} pt-16 md:pt-10 pb-10 px-4 md:px-10`}>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
 
             <div className="flex items-center justify-between mb-8">
@@ -883,7 +874,7 @@ const Learn = () => {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {sidebar}
-      <div className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} py-10 px-8`}>
+      <div className={`flex-1 overflow-y-auto transition-all duration-300 ${contentML} pt-16 md:pt-10 pb-10 px-4 md:px-8`}>
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
 
           <div className="mb-6">
