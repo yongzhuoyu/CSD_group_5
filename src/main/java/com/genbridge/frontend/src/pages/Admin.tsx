@@ -51,7 +51,7 @@ export default function Admin() {
 
   if (role !== "ADMIN") return <Navigate to="/lessons" replace />;
 
-  const [tab, setTab] = useState<"lessons" | "content" | "quiz" | "reports" | "forum" | "quests">("lessons");
+  const [tab, setTab] = useState<"lessons" | "content" | "quiz" | "reports" | "forum" | "quests" | "users">("lessons");
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loadingLessons, setLoadingLessons] = useState(true);
 
@@ -113,6 +113,17 @@ export default function Admin() {
   const [loadingReports, setLoadingReports] = useState(false);
   // =================================================
 
+  // ================= USERS STATE =================
+  const [users, setUsers] = useState<any[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [expandedUser, setExpandedUser] = useState<string | null>(null);
+  const [userWarnings, setUserWarnings] = useState<Record<string, any[]>>({});
+  const [warnModalUser, setWarnModalUser] = useState<any | null>(null);
+  const [suspendModalUser, setSuspendModalUser] = useState<any | null>(null);
+  const [moderationReason, setModerationReason] = useState("");
+  const [savingModeration, setSavingModeration] = useState(false);
+  // ================================================
+
   // ================= QUESTS STATE =================
   const [quests, setQuests] = useState<Quest[]>([]);
   const [loadingQuests, setLoadingQuests] = useState(false);
@@ -139,6 +150,9 @@ export default function Admin() {
     }
     if (tab === "quests") {
       loadQuests();
+    }
+    if (tab === "users") {
+      loadUsers();
     }
   }, [tab]);
 
@@ -265,6 +279,72 @@ export default function Admin() {
     }
   };
   // ================================================
+
+  // ================= USERS MODERATION =================
+  const loadUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const res = await api.get("/admin/users");
+      setUsers(res.data);
+    } catch {
+      toast({ title: "Error loading users" });
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const loadUserWarnings = async (userId: string) => {
+    try {
+      const res = await api.get(`/admin/users/${userId}/warnings`);
+      setUserWarnings(prev => ({ ...prev, [userId]: res.data }));
+    } catch {
+      toast({ title: "Error loading warnings" });
+    }
+  };
+
+  const warnUser = async () => {
+    if (!warnModalUser || !moderationReason.trim()) return;
+    setSavingModeration(true);
+    try {
+      await api.post(`/admin/users/${warnModalUser.id}/warn`, { reason: moderationReason });
+      toast({ title: `Warning issued to ${warnModalUser.name || warnModalUser.email}` });
+      setWarnModalUser(null);
+      setModerationReason("");
+      loadUsers();
+      if (expandedUser === warnModalUser.id) loadUserWarnings(warnModalUser.id);
+    } catch {
+      toast({ title: "Error issuing warning" });
+    } finally {
+      setSavingModeration(false);
+    }
+  };
+
+  const suspendUser = async () => {
+    if (!suspendModalUser || !moderationReason.trim()) return;
+    setSavingModeration(true);
+    try {
+      await api.post(`/admin/users/${suspendModalUser.id}/suspend`, { reason: moderationReason });
+      toast({ title: `${suspendModalUser.name || suspendModalUser.email} has been suspended` });
+      setSuspendModalUser(null);
+      setModerationReason("");
+      loadUsers();
+    } catch {
+      toast({ title: "Error suspending user" });
+    } finally {
+      setSavingModeration(false);
+    }
+  };
+
+  const unsuspendUser = async (user: any) => {
+    try {
+      await api.post(`/admin/users/${user.id}/unsuspend`);
+      toast({ title: `${user.name || user.email} has been unsuspended` });
+      loadUsers();
+    } catch {
+      toast({ title: "Error unsuspending user" });
+    }
+  };
+  // =====================================================
 
   // Validate lesson
   const validateLesson = () => {
@@ -426,7 +506,7 @@ export default function Admin() {
       <div className="flex-1 ml-72 pt-12 pb-16 px-8">
         <div className="max-w-5xl mx-auto">
           <h1 className="font-display text-3xl font-bold text-foreground mb-8">
-            {tab === "lessons" ? "Lessons" : tab === "content" ? "Content" : tab === "quiz" ? "Quiz" : tab === "reports" ? "Reports" : tab === "quests" ? "Quests" : "Forum Moderation"}
+            {tab === "lessons" ? "Lessons" : tab === "content" ? "Content" : tab === "quiz" ? "Quiz" : tab === "reports" ? "Reports" : tab === "quests" ? "Quests" : tab === "users" ? "Users" : "Forum Moderation"}
           </h1>
 
           {/* LESSONS TAB */}
@@ -1041,6 +1121,138 @@ export default function Admin() {
                     <Button onClick={saveQuest} disabled={savingQuest} className="w-full">
                       {savingQuest ? "Saving..." : "Save"}
                     </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </>
+          )}
+
+          {/* USERS TAB */}
+          {tab === "users" && (
+            <>
+              <p className="text-sm text-muted-foreground mb-6">
+                Manage learner accounts — issue warnings or suspend users who violate community guidelines.
+              </p>
+              {loadingUsers ? (
+                <p>Loading users...</p>
+              ) : users.length === 0 ? (
+                <p className="text-muted-foreground">No users found.</p>
+              ) : (
+                <div className="space-y-3">
+                  {users.map((user) => (
+                    <motion.div key={user.id} whileHover={{ scale: 1.005 }} className="border rounded-xl bg-card shadow-sm overflow-hidden">
+                      <div className="flex items-center justify-between gap-4 px-6 py-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-sm">{user.name || user.email}</p>
+                            {user.isSuspended && (
+                              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">Suspended</span>
+                            )}
+                            {user.warningCount > 0 && (
+                              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
+                                {user.warningCount} warning{user.warningCount > 1 ? "s" : ""}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">{user.email}</p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Button size="sm" variant="outline" onClick={() => {
+                            const newId = expandedUser === user.id ? null : user.id;
+                            setExpandedUser(newId);
+                            if (newId) loadUserWarnings(user.id);
+                          }}>
+                            {expandedUser === user.id ? "Hide" : "History"}
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => { setWarnModalUser(user); setModerationReason(""); }}>
+                            Warn
+                          </Button>
+                          {user.isSuspended ? (
+                            <Button size="sm" onClick={() => unsuspendUser(user)}>Unsuspend</Button>
+                          ) : (
+                            <Button size="sm" variant="destructive" onClick={() => { setSuspendModalUser(user); setModerationReason(""); }}>
+                              Suspend
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
+                      {expandedUser === user.id && (
+                        <div className="border-t border-border px-6 py-4">
+                          {user.isSuspended && user.suspensionReason && (
+                            <p className="text-xs text-red-600 mb-3">
+                              <span className="font-semibold">Suspension reason:</span> {user.suspensionReason}
+                            </p>
+                          )}
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Warning History</p>
+                          {!userWarnings[user.id] ? (
+                            <p className="text-xs text-muted-foreground">Loading...</p>
+                          ) : userWarnings[user.id].length === 0 ? (
+                            <p className="text-xs text-muted-foreground">No warnings issued.</p>
+                          ) : (
+                            <div className="space-y-2">
+                              {userWarnings[user.id].map((w) => (
+                                <div key={w.id} className="bg-muted rounded-lg px-4 py-2">
+                                  <p className="text-xs text-muted-foreground">{new Date(w.createdAt).toLocaleDateString()}</p>
+                                  <p className="text-sm">{w.reason}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+
+              {/* Warn Modal */}
+              <Dialog open={!!warnModalUser} onOpenChange={(open) => { if (!open) setWarnModalUser(null); }}>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Issue Warning to {warnModalUser?.name || warnModalUser?.email}</DialogTitle>
+                  </DialogHeader>
+                  <p className="text-sm text-muted-foreground mt-1">The user will not be notified automatically, but this warning will be recorded in their history.</p>
+                  <div className="space-y-4 mt-3">
+                    <Textarea
+                      placeholder="Reason for warning (e.g. Posted offensive content in the forum)"
+                      value={moderationReason}
+                      onChange={(e) => setModerationReason(e.target.value)}
+                      rows={3}
+                    />
+                    <div className="flex gap-3">
+                      <Button variant="outline" className="flex-1" onClick={() => setWarnModalUser(null)}>Cancel</Button>
+                      <Button className="flex-1" disabled={savingModeration || !moderationReason.trim()} onClick={warnUser}>
+                        {savingModeration ? "Saving..." : "Issue Warning"}
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* Suspend Modal */}
+              <Dialog open={!!suspendModalUser} onOpenChange={(open) => { if (!open) setSuspendModalUser(null); }}>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2 text-destructive">
+                      <AlertTriangle className="w-5 h-5" />
+                      Suspend {suspendModalUser?.name || suspendModalUser?.email}?
+                    </DialogTitle>
+                  </DialogHeader>
+                  <p className="text-sm text-muted-foreground mt-1">The user will be blocked from posting or commenting in the forum.</p>
+                  <div className="space-y-4 mt-3">
+                    <Textarea
+                      placeholder="Reason for suspension (e.g. Repeated offensive posts after warning)"
+                      value={moderationReason}
+                      onChange={(e) => setModerationReason(e.target.value)}
+                      rows={3}
+                    />
+                    <div className="flex gap-3">
+                      <Button variant="outline" className="flex-1" onClick={() => setSuspendModalUser(null)}>Cancel</Button>
+                      <Button variant="destructive" className="flex-1" disabled={savingModeration || !moderationReason.trim()} onClick={suspendUser}>
+                        {savingModeration ? "Saving..." : "Suspend User"}
+                      </Button>
+                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
