@@ -146,7 +146,26 @@ const Glossary = () => {
                         {term.source && (
                           <p className="text-xs text-muted-foreground flex items-center gap-1">
                             <ExternalLink className="w-3 h-3 shrink-0" />
-                            Source: {term.source}
+                            Source:{" "}
+                            {term.source.startsWith("http") ? (
+                              <a
+                                href={term.source}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline hover:text-foreground transition-colors"
+                              >
+                                {term.source}
+                              </a>
+                            ) : (
+                              <a
+                                href={`https://www.urbandictionary.com/define.php?term=${encodeURIComponent(term.term)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline hover:text-foreground transition-colors"
+                              >
+                                {term.source}
+                              </a>
+                            )}
                           </p>
                         )}
                       </motion.div>
