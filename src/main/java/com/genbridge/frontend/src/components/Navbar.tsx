@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, Flame, Star } from "lucide-react";
+import { LogOut, Flame, Star, Trophy } from "lucide-react";
 import BridgeIcon from "@/assets/icons/bridge.svg?react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -61,6 +61,12 @@ const Navbar = () => {
               </div>
               <Button variant="ghost" asChild style={{ color: "#1a2e1a" }}>
                 <Link to="/lessons">Lessons</Link>
+              </Button>
+              <Button variant="ghost" asChild style={{ color: "#1a2e1a" }}>
+                <Link to="/leaderboard" className="flex items-center gap-1.5">
+                  <Trophy className="w-4 h-4" />
+                  Leaderboard
+                </Link>
               </Button>
               <Button variant="ghost" asChild style={{ color: "#1a2e1a" }}>
                 <Link to="/profile">Profile</Link>

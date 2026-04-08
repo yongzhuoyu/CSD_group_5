@@ -36,7 +36,7 @@ const AppSidebar = ({ activePage }: AppSidebarProps) => {
   const sidebarW = expanded ? "w-72" : "w-16";
 
   const navItems = [
-    { icon: HomeIcon,       label: "Home",     href: "/lessons",   page: "home"     },
+    { icon: HomeIcon,       label: "Home",     href: "/home",      page: "home"     },
     { icon: DictionaryIcon, label: "Learn",    href: "/lessons",   page: "learn"    },
     { icon: BookOpen,       label: "Glossary", href: "/glossary",  page: "glossary" },
     { icon: ForumIcon,      label: "Forum",    href: "/forum",     page: "forum"    },

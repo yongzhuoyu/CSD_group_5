@@ -148,6 +148,13 @@ const Learn = () => {
   const [lessonQuiz, setLessonQuiz] = useState<QuizQuestion[]>([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
+  // ── Leaderboard state ─────────────────────────────────────────────────────
+  const [leaderboard, setLeaderboard] = useState<{ rank: number; name: string; xp: number; currentStreak: number }[]>([]);
+
+  useEffect(() => {
+    api.get("/leaderboard").then(res => setLeaderboard(res.data)).catch(() => {});
+  }, []);
+
   // ── UI state ───────────────────────────────────────────────────────────────
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [showQuiz, setShowQuiz] = useState(false);
@@ -157,14 +164,12 @@ const Learn = () => {
   const [xpPop, setXpPop] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<"All" | "Beginner" | "Intermediate" | "Advanced">("All");
-  const [currentPage, setCurrentPage] = useState<"home" | "learn">(
-    () => (sessionStorage.getItem("learn_view") as "home" | "learn") ?? "home"
-  );
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const currentPage: "home" | "learn" = location.pathname === "/lessons" ? "learn" : "home";
   const [learnedWordsOpen, setLearnedWordsOpen] = useState(false);
 
   const changePage = (page: "home" | "learn") => {
-    sessionStorage.setItem("learn_view", page);
-    setCurrentPage(page);
+    navigate(page === "home" ? "/home" : "/lessons");
   };
 
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -341,24 +346,25 @@ const Learn = () => {
       )}
 
       <nav className="flex-1 p-3 space-y-1 overflow-hidden">
-        <button
-          onClick={() => changePage("home")}
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors w-full text-left ${
-            currentPage === "home" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-          } ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <HomeIcon className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span className="whitespace-nowrap">Home</span>}
-        </button>
-        <button
-          onClick={() => changePage("learn")}
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors w-full text-left ${
-            currentPage === "learn" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-          } ${!sidebarExpanded ? "justify-center" : ""}`}
-        >
-          <DictionaryIcon className="w-6 h-6 shrink-0" />
-          {sidebarExpanded && <span className="whitespace-nowrap">Learn</span>}
-        </button>
+        {([
+          { icon: HomeIcon,       label: "Home",  href: "/home"    },
+          { icon: DictionaryIcon, label: "Learn", href: "/lessons" },
+        ]).map(({ icon: Icon, label, href }) => {
+          const isActive = location.pathname === href && !selectedLesson;
+          return (
+            <Link
+              key={label}
+              to={href}
+              onClick={() => { setSelectedLesson(null); setLessonContent([]); setLessonQuiz([]); setShowQuiz(false); }}
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors ${
+                isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              } ${!sidebarExpanded ? "justify-center" : ""}`}
+            >
+              <Icon className="w-6 h-6 shrink-0" />
+              {sidebarExpanded && <span className="whitespace-nowrap">{label}</span>}
+            </Link>
+          );
+        })}
         <Link
           to="/glossary"
           className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sidebar text-xl font-semibold transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${!sidebarExpanded ? "justify-center" : ""}`}
@@ -774,6 +780,35 @@ const Learn = () => {
                 </div>
               </div>
             </div>
+
+            {/* Leaderboard */}
+            {leaderboard.length > 0 && (
+              <div className="rounded-2xl border border-border bg-card p-6 mb-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Trophy className="w-5 h-5 text-primary" />
+                  <span className="font-display text-xl font-semibold text-card-foreground">Leaderboard</span>
+                  <span className="ml-auto text-xs text-muted-foreground">Top 5 learners</span>
+                </div>
+                <div className="space-y-2">
+                  {leaderboard.map((entry) => (
+                    <div key={entry.rank} className={`flex items-center gap-3 px-3 py-2 rounded-xl ${entry.rank <= 3 ? "bg-primary/5" : "bg-muted/30"}`}>
+                      <span className="w-6 text-center text-sm font-bold text-muted-foreground shrink-0">
+                        {entry.rank === 1 ? "🥇" : entry.rank === 2 ? "🥈" : entry.rank === 3 ? "🥉" : `#${entry.rank}`}
+                      </span>
+                      <span className="flex-1 text-sm font-medium text-foreground truncate">{entry.name}</span>
+                      {entry.currentStreak > 0 && (
+                        <span className="flex items-center gap-0.5 text-xs font-bold text-orange-500">
+                          <Flame className="w-3 h-3" />{entry.currentStreak}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1 text-xs font-bold text-primary">
+                        <Star className="w-3 h-3" />{entry.xp} XP
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Did You Know — only shown when all lessons are completed */}
             {lessons.length > 0 && !nextLesson && (
