@@ -1,7 +1,17 @@
 import { useState, useEffect } from "react";
+import { Trash2, MessageCircle, Plus, ChevronRight } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { MessageCircle, Plus, ChevronRight } from "lucide-react";
 import AppSidebar from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -20,6 +30,17 @@ interface ForumPost {
 
 const Forum = () => {
   const { toast } = useToast();
+  const isAdmin = localStorage.getItem("role") === "ADMIN";
+
+  const deletePost = async (postId: number) => {
+    try {
+      await api.delete(`/forum/posts/${postId}`);
+      toast({ title: "Post deleted successfully" });
+      fetchPosts();
+    } catch {
+      toast({ title: "Failed to delete post", variant: "destructive" });
+    }
+  };
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -107,6 +128,36 @@ const Forum = () => {
                         by {post.userName} · {new Date(post.createdAt).toLocaleDateString()}
                       </p>
                     </div>
+                    {isAdmin && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 ml-auto shrink-0 hover:bg-destructive/20 p-0"
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Post</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete the post and all its comments. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <div className="flex gap-2">
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              onClick={() => deletePost(post.id)}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </div>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                     <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
                   </Link>
                 </motion.div>

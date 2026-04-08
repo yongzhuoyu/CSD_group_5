@@ -1,9 +1,19 @@
 import { useState, useEffect } from "react";
+import { Trash2, ArrowLeft, MessageCircle, Send } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, MessageCircle, Send } from "lucide-react";
 import AppSidebar from "@/components/AppSidebar";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import api from "@/services/api";
@@ -28,6 +38,28 @@ const ForumPostDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isAdmin = localStorage.getItem("role") === "ADMIN";
+
+  const deletePost = async () => {
+    if (!id) return;
+    try {
+      await api.delete(`/forum/posts/${id}`);
+      toast({ title: "Post deleted successfully" });
+      navigate("/forum");
+    } catch {
+      toast({ title: "Failed to delete post", variant: "destructive" });
+    }
+  };
+
+  const deleteComment = async (commentId: number) => {
+    try {
+      await api.delete(`/forum/comments/${commentId}`);
+      toast({ title: "Comment deleted successfully" });
+      fetchPost();
+    } catch {
+      toast({ title: "Failed to delete comment", variant: "destructive" });
+    }
+  };
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [commentBody, setCommentBody] = useState("");
@@ -98,6 +130,36 @@ const ForumPostDetail = () => {
             <p className="text-xs text-muted-foreground mb-4">
               by {post.userName} · {new Date(post.createdAt).toLocaleDateString()}
             </p>
+            {isAdmin && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 absolute top-4 right-4 hover:bg-destructive/20 p-0"
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Post</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete the entire post and all its comments. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <div className="flex gap-2">
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      onClick={deletePost}
+                    >
+                      Delete Post
+                    </AlertDialogAction>
+                  </div>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
             <p className="text-sm text-card-foreground leading-relaxed whitespace-pre-wrap">{post.body}</p>
           </motion.div>
 
@@ -123,6 +185,36 @@ const ForumPostDetail = () => {
                     {comment.userName} · {new Date(comment.createdAt).toLocaleDateString()}
                   </p>
                   <p className="text-sm text-card-foreground leading-relaxed whitespace-pre-wrap">{comment.body}</p>
+                  {isAdmin && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 text-xs ml-auto shrink-0 hover:bg-destructive/20 p-0"
+                        >
+                          <Trash2 className="h-3 w-3 text-destructive" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Comment</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently delete this comment. This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <div className="flex gap-2">
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            onClick={() => deleteComment(comment.id)}
+                          >
+                            Delete Comment
+                          </AlertDialogAction>
+                        </div>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                 </motion.div>
               ))
             )}
