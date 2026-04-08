@@ -261,22 +261,6 @@ No manual schema migration needed. Hibernate auto-creates and updates the schema
 
 ---
 
-## Data Model
-
-| Entity | Key Fields |
-|--------|-----------|
-| `users` | UUID PK, name, email, role (ADMIN/LEARNER), current_streak, xp, is_suspended |
-| `lessons` | BIGINT PK, title, description, objective, difficulty, is_published |
-| `content` | lesson_id FK, term, title, description, example, order_index |
-| `quiz_questions` | lesson_id FK, question_text, 4 options, correct_index, explanation |
-| `lesson_progress` | user_id + lesson_id (unique), completed, started_at, completed_at |
-| `quiz_attempts` | user_id FK, lesson_id FK, score, total_questions, correct_answers |
-| `content_reports` | lesson_id FK, reported_by FK, description, status (OPEN/RESOLVED) |
-| `forum_posts` | user_id FK, title, content, created_at |
-| `forum_comments` | post_id FK, user_id FK, content, created_at |
-| `quests` | title, description, instructions, difficulty, xp_reward |
-| `quest_completions` | quest_id + user_id (unique), reflection, completed_at |
-
 ### Key Business Rules
 
 - **XP per quiz**: Beginner = 10 XP, Intermediate = 15 XP, Advanced = 20 XP
