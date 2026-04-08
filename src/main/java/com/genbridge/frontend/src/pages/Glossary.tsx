@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import AppSidebar from "@/components/AppSidebar";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import api from "@/services/api";
-import { Search, BookOpen, MessageCircle, ShieldCheck, ExternalLink, Loader2 } from "lucide-react";
+import { Search, BookOpen, MessageCircle, ShieldCheck, ExternalLink, Loader2, ArrowLeft } from "lucide-react";
 
 interface GlossaryTerm {
   id: number;
@@ -21,6 +22,7 @@ const Glossary = () => {
   const [terms, setTerms] = useState<GlossaryTerm[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const isAdmin = localStorage.getItem("role") === "ADMIN";
 
   useEffect(() => {
     api
@@ -53,9 +55,19 @@ const Glossary = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <AppSidebar activePage="glossary" />
-      <div className="flex-1 ml-72 pt-12 pb-16 px-8">
+      {!isAdmin && <AppSidebar activePage="glossary" />}
+      <div className={`flex-1 ${!isAdmin ? "ml-72" : ""} pt-12 pb-16 px-8`}>
         <div className="max-w-3xl mx-auto">
+
+          {/* Admin back link */}
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to Admin
+            </Link>
+          )}
 
           {/* Header */}
           <div className="mb-8">

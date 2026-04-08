@@ -234,7 +234,7 @@ const Learn = () => {
     setQuizScore(null);
     setLoadingDetail(true);
     try {
-      await api.post(`/lessons/${lesson.id}/start`);
+      await api.post(`/lessons/${lesson.id}/progress`);
       const [contentRes, quizRes] = await Promise.all([
         api.get(`/content/lesson/${lesson.id}`),
         api.get(`/lessons/${lesson.id}/quiz`),
@@ -253,7 +253,7 @@ const Learn = () => {
     if (!selectedLesson) return;
     const answers: Record<number, number> = quizAnswers;
     try {
-      const res = await api.post(`/lessons/${selectedLesson.id}/quiz/submit`, { answers });
+      const res = await api.post(`/lessons/${selectedLesson.id}/quiz/attempts`, { answers });
       const { score, totalQuestions, allCorrect } = res.data;
       setQuizScore({ score, total: totalQuestions });
       setQuizSubmitted(true);
