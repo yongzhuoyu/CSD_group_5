@@ -26,7 +26,7 @@ class LessonServiceTest {
     private LessonRepository lessonRepository;
 
     @InjectMocks
-    private LessonService lessonService;
+    private LessonServiceImpl lessonService;
 
     private Lesson publishedLesson;
     private Lesson unpublishedLesson;

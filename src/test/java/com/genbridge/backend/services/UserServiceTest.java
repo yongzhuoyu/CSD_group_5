@@ -3,7 +3,7 @@ package com.genbridge.backend.services;
 import com.genbridge.backend.config.JwtUtil;
 import com.genbridge.backend.user.User;
 import com.genbridge.backend.user.UserRepository;
-import com.genbridge.backend.user.UserService;
+import com.genbridge.backend.user.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +26,7 @@ class UserServiceTest {
     @Mock private JwtUtil jwtUtil;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     private User user;
 

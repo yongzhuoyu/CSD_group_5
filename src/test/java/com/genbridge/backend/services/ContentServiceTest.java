@@ -25,7 +25,7 @@ class ContentServiceTest {
     private ContentRepository contentRepository;
 
     @InjectMocks
-    private ContentService contentService;
+    private ContentServiceImpl contentService;
 
     private Content sampleContent;
     private ContentRequest sampleRequest;

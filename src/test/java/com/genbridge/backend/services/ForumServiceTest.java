@@ -32,7 +32,7 @@ class ForumServiceTest {
     private ForumCommentRepository commentRepository;
 
     @InjectMocks
-    private ForumService forumService;
+    private ForumServiceImpl forumService;
 
     private User activeUser;
     private User suspendedUser;

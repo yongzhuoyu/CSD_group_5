@@ -8,6 +8,7 @@ import com.genbridge.backend.repository.QuizAttemptRepository;
 import com.genbridge.backend.repository.QuizQuestionRepository;
 import com.genbridge.backend.user.User;
 import com.genbridge.backend.user.UserService;
+import com.genbridge.backend.user.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,7 @@ class QuizServiceTest {
     @Mock private UserService userService;
 
     @InjectMocks
-    private QuizService quizService;
+    private QuizServiceImpl quizService;
 
     private User user;
     private QuizQuestion question;

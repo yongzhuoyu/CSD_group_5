@@ -35,7 +35,7 @@ class QuestServiceTest {
     private QuestCompletionRepository questCompletionRepository;
 
     @InjectMocks
-    private QuestService questService;
+    private QuestServiceImpl questService;
 
     private User user;
     private Quest quest;
